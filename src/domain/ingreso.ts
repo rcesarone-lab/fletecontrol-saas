@@ -4,7 +4,9 @@
   | "MERCADOPAGO"
   | "CHEQUE";
 
-export type EstadoCobro = "PENDIENTE" | "COBRADO";
+export type EstadoCobro =
+  | "PENDIENTE"
+  | "COBRADO";
 
 export type Ingreso = {
   id: string;
@@ -14,6 +16,8 @@ export type Ingreso = {
   clienteId?: string;
 
   cliente: string;
+
+  envioId?: string;
 
   concepto: string;
 

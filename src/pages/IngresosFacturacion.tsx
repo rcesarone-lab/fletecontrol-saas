@@ -1,8 +1,12 @@
 import IngresoForm from "../components/ingresos/IngresoForm";
 
-import IngresosTable from "../components/ingresos/IngresosTable.tsx";
+import IngresosTable from "../components/ingresos/IngresosTable";
+
+import Toast from "../components/ui/Toast";
 
 import { useIngresos } from "../hooks/useIngresos";
+
+import { useToast } from "../hooks/useToast";
 
 import { formatCurrency } from "../utils/currency";
 
@@ -12,6 +16,9 @@ export default function IngresosFacturacion() {
     agregarIngreso,
     eliminarIngreso,
   } = useIngresos();
+
+  const { message, type, showToast, clearToast } =
+    useToast();
 
   const totalBruto = ingresos.reduce(
     (total, ingreso) => total + ingreso.monto,
@@ -103,7 +110,15 @@ export default function IngresosFacturacion() {
       </section>
 
       <div style={{ marginTop: 18 }}>
-        <IngresoForm onSubmit={agregarIngreso} />
+        <IngresoForm
+          onSubmit={agregarIngreso}
+          onError={(msg) =>
+            showToast(msg, "error")
+          }
+          onSuccess={(msg) =>
+            showToast(msg, "success")
+          }
+        />
       </div>
 
       <div style={{ marginTop: 18 }}>
@@ -112,6 +127,12 @@ export default function IngresosFacturacion() {
           onDelete={eliminarIngreso}
         />
       </div>
+
+      <Toast
+        message={message}
+        type={type}
+        onClose={clearToast}
+      />
     </>
   );
 }

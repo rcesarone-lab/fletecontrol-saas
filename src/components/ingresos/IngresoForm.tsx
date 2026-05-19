@@ -16,6 +16,10 @@ type IngresoFormProps = {
     estado: EstadoCobro;
     facturaEmitida: boolean;
   }) => void;
+
+  onError: (message: string) => void;
+
+  onSuccess: (message: string) => void;
 };
 
 const metodos: MetodoCobro[] = [
@@ -32,6 +36,8 @@ const estados: EstadoCobro[] = [
 
 export default function IngresoForm({
   onSubmit,
+  onError,
+  onSuccess,
 }: IngresoFormProps) {
   const [cliente, setCliente] = useState("");
 
@@ -59,8 +65,18 @@ export default function IngresoForm({
   function handleSubmit(event: FormEvent) {
     event.preventDefault();
 
-    if (!cliente.trim() || !concepto.trim()) {
-      alert("Completá cliente y concepto.");
+    if (!cliente.trim()) {
+      onError("Completá el cliente.");
+      return;
+    }
+
+    if (!concepto.trim()) {
+      onError("Completá el concepto.");
+      return;
+    }
+
+    if (monto <= 0) {
+      onError("El monto debe ser mayor a cero.");
       return;
     }
 
@@ -74,6 +90,8 @@ export default function IngresoForm({
       estado,
       facturaEmitida,
     });
+
+    onSuccess("Ingreso registrado correctamente.");
 
     setCliente("");
     setConcepto("");

@@ -9,6 +9,8 @@ type AyudanteFormProps = {
     metodoPago: MetodoPago;
     comprobanteUrl?: string;
   }) => void;
+  onError: (message: string) => void;
+  onSuccess: (message: string) => void;
 };
 
 const metodosPago: MetodoPago[] = [
@@ -18,7 +20,11 @@ const metodosPago: MetodoPago[] = [
   "CHEQUE",
 ];
 
-export default function AyudanteForm({ onSubmit }: AyudanteFormProps) {
+export default function AyudanteForm({
+  onSubmit,
+  onError,
+  onSuccess,
+}: AyudanteFormProps) {
   const [ayudanteNombre, setAyudanteNombre] = useState("");
   const [horasTrabajadas, setHorasTrabajadas] = useState(0);
   const [valorHora, setValorHora] = useState(4500);
@@ -32,8 +38,18 @@ export default function AyudanteForm({ onSubmit }: AyudanteFormProps) {
   function handleSubmit(event: FormEvent) {
     event.preventDefault();
 
-    if (!ayudanteNombre.trim() || horasTrabajadas <= 0 || valorHora <= 0) {
-      alert("Completá nombre, horas y valor hora válido.");
+    if (!ayudanteNombre.trim()) {
+      onError("Completá el nombre del ayudante.");
+      return;
+    }
+
+    if (horasTrabajadas <= 0) {
+      onError("Las horas trabajadas deben ser mayores a cero.");
+      return;
+    }
+
+    if (valorHora <= 0) {
+      onError("El valor hora debe ser mayor a cero.");
       return;
     }
 
@@ -44,6 +60,8 @@ export default function AyudanteForm({ onSubmit }: AyudanteFormProps) {
       metodoPago,
       comprobanteUrl,
     });
+
+    onSuccess("Pago de ayudante registrado correctamente.");
 
     setAyudanteNombre("");
     setHorasTrabajadas(0);
@@ -56,6 +74,7 @@ export default function AyudanteForm({ onSubmit }: AyudanteFormProps) {
     <form className="card form-grid" onSubmit={handleSubmit}>
       <div className="form-field">
         <label>Ayudante</label>
+
         <input
           value={ayudanteNombre}
           onChange={(e) => setAyudanteNombre(e.target.value)}
@@ -65,26 +84,27 @@ export default function AyudanteForm({ onSubmit }: AyudanteFormProps) {
 
       <div className="form-field">
         <label>Horas trabajadas</label>
+
         <input
           type="number"
           value={horasTrabajadas}
           onChange={(e) => setHorasTrabajadas(Number(e.target.value))}
-          placeholder="Ej: 6"
         />
       </div>
 
       <div className="form-field">
         <label>Valor hora</label>
+
         <input
           type="number"
           value={valorHora}
           onChange={(e) => setValorHora(Number(e.target.value))}
-          placeholder="Ej: 4500"
         />
       </div>
 
       <div className="form-field">
         <label>Método de pago</label>
+
         <select
           value={metodoPago}
           onChange={(e) => setMetodoPago(e.target.value as MetodoPago)}
@@ -99,19 +119,24 @@ export default function AyudanteForm({ onSubmit }: AyudanteFormProps) {
 
       <div className="form-field full">
         <label>Comprobante / referencia</label>
+
         <input
           value={comprobanteUrl}
           onChange={(e) => setComprobanteUrl(e.target.value)}
-          placeholder="Ej: link, nro. de transferencia o referencia interna"
+          placeholder="Ej: nro transferencia o referencia"
         />
       </div>
 
       <article className="card">
         <div className="card-label">Monto calculado</div>
+
         <div className="card-value">
           ${montoCalculado.toLocaleString("es-AR")}
         </div>
-        <div className="card-note">Horas x valor hora</div>
+
+        <div className="card-note">
+          Horas x valor hora
+        </div>
       </article>
 
       <button className="primary-button" type="submit">

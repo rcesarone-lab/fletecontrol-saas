@@ -1,4 +1,4 @@
-import { type FormEvent, useState } from "react";
+import { FormEvent, useState } from "react";
 import type { TipoGastoVehiculo } from "../../domain/vehiculo";
 
 type GastoVehiculoFormProps = {
@@ -8,6 +8,8 @@ type GastoVehiculoFormProps = {
     monto: number;
     vencimiento?: string;
   }) => void;
+  onError: (message: string) => void;
+  onSuccess: (message: string) => void;
 };
 
 const tipos: TipoGastoVehiculo[] = [
@@ -20,6 +22,8 @@ const tipos: TipoGastoVehiculo[] = [
 
 export default function GastoVehiculoForm({
   onSubmit,
+  onError,
+  onSuccess,
 }: GastoVehiculoFormProps) {
   const [tipo, setTipo] = useState<TipoGastoVehiculo>("COMBUSTIBLE");
   const [descripcion, setDescripcion] = useState("");
@@ -29,17 +33,18 @@ export default function GastoVehiculoForm({
   function handleSubmit(event: FormEvent) {
     event.preventDefault();
 
-    if (!descripcion.trim() || monto <= 0) {
-      alert("Completá descripción y monto válido.");
+    if (!descripcion.trim()) {
+      onError("Completá la descripción del gasto.");
       return;
     }
 
-    onSubmit({
-      tipo,
-      descripcion,
-      monto,
-      vencimiento,
-    });
+    if (monto <= 0) {
+      onError("El monto debe ser mayor a cero.");
+      return;
+    }
+
+    onSubmit({ tipo, descripcion, monto, vencimiento });
+    onSuccess("Gasto registrado correctamente.");
 
     setTipo("COMBUSTIBLE");
     setDescripcion("");
@@ -78,7 +83,6 @@ export default function GastoVehiculoForm({
           type="number"
           value={monto}
           onChange={(e) => setMonto(Number(e.target.value))}
-          placeholder="Ej: 45000"
         />
       </div>
 

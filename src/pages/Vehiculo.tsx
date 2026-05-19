@@ -1,10 +1,13 @@
 import GastoVehiculoForm from "../components/vehiculo/GastoVehiculoForm";
 import GastosVehiculoTable from "../components/vehiculo/GastosVehiculoTable";
+import Toast from "../components/ui/Toast";
+import { useToast } from "../hooks/useToast";
 import { useVehiculo } from "../hooks/useVehiculo";
 import { formatCurrency } from "../utils/currency";
 
 export default function Vehiculo() {
   const { gastos, agregarGasto, eliminarGasto } = useVehiculo();
+  const { message, type, showToast, clearToast } = useToast();
 
   const totalGastos = gastos.reduce((total, gasto) => total + gasto.monto, 0);
 
@@ -55,12 +58,18 @@ export default function Vehiculo() {
       </section>
 
       <div style={{ marginTop: 18 }}>
-        <GastoVehiculoForm onSubmit={agregarGasto} />
+        <GastoVehiculoForm
+          onSubmit={agregarGasto}
+          onError={(msg) => showToast(msg, "error")}
+          onSuccess={(msg) => showToast(msg, "success")}
+        />
       </div>
 
       <div style={{ marginTop: 18 }}>
         <GastosVehiculoTable gastos={gastos} onDelete={eliminarGasto} />
       </div>
+
+      <Toast message={message} type={type} onClose={clearToast} />
     </>
   );
 }

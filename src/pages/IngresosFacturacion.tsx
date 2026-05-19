@@ -5,9 +5,11 @@ import { useClientes } from "../hooks/useClientes";
 import { useIngresos } from "../hooks/useIngresos";
 import { useToast } from "../hooks/useToast";
 import { formatCurrency } from "../utils/currency";
+import { useEnvios } from "../hooks/useEnvios";
 
 export default function IngresosFacturacion() {
   const { clientes } = useClientes();
+  const { envios } = useEnvios();
   const { ingresos, agregarIngreso, eliminarIngreso } = useIngresos();
   const { message, type, showToast, clearToast } = useToast();
 
@@ -77,6 +79,7 @@ export default function IngresosFacturacion() {
         <div style={{ marginTop: 18 }}>
           <IngresoForm
             clientes={clientes}
+            envios={envios}
             onSubmit={agregarIngreso}
             onError={(msg) => showToast(msg, "error")}
             onSuccess={(msg) => showToast(msg, "success")}

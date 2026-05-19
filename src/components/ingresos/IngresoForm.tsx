@@ -1,12 +1,16 @@
-import { type FormEvent, useMemo, useState } from "react";
+import { type FormEvent, useEffect, useMemo, useState } from "react";
 import type { Cliente } from "../../domain/cliente";
+import type { Envio } from "../../domain/envio";
 import type { EstadoCobro, MetodoCobro } from "../../domain/ingreso";
 
 type IngresoFormProps = {
   clientes: Cliente[];
 
+  envios: Envio[];
+
   onSubmit: (data: {
     clienteId?: string;
+    envioId?: string;
     cliente: string;
     clienteCuit?: string;
     clienteDireccion?: string;
@@ -34,11 +38,13 @@ const estados: EstadoCobro[] = ["PENDIENTE", "COBRADO"];
 
 export default function IngresoForm({
   clientes,
+  envios,
   onSubmit,
   onError,
   onSuccess,
 }: IngresoFormProps) {
   const [clienteId, setClienteId] = useState("");
+  const [envioId, setEnvioId] = useState("");
   const [concepto, setConcepto] = useState("");
   const [monto, setMonto] = useState(0);
   const [metodoCobro, setMetodoCobro] =
@@ -52,9 +58,29 @@ export default function IngresoForm({
     (cliente) => cliente.id === clienteId
   );
 
+  const enviosCliente = envios.filter(
+    (envio) =>
+      envio.clienteId === clienteId &&
+      envio.estado !== "CANCELADO"
+  );
+
+  const envioSeleccionado = envios.find(
+    (envio) => envio.id === envioId
+  );
+
   const montoNeto = useMemo(() => {
     return monto - comision - retencion;
   }, [monto, comision, retencion]);
+
+  useEffect(() => {
+    if (!envioSeleccionado) return;
+
+    setMonto(envioSeleccionado.tarifaContratante);
+
+    setConcepto(
+      `Servicio de transporte - ${envioSeleccionado.materiales}`
+    );
+  }, [envioSeleccionado]);
 
   function handleSubmit(event: FormEvent) {
     event.preventDefault();
@@ -81,6 +107,7 @@ export default function IngresoForm({
 
     onSubmit({
       clienteId: clienteSeleccionado.id,
+      envioId,
       cliente: clienteSeleccionado.razonSocial,
       clienteCuit: clienteSeleccionado.cuit,
       clienteDireccion: clienteSeleccionado.direccion,
@@ -96,6 +123,7 @@ export default function IngresoForm({
     onSuccess("Ingreso registrado correctamente.");
 
     setClienteId("");
+    setEnvioId("");
     setConcepto("");
     setMonto(0);
     setMetodoCobro("TRANSFERENCIA");
@@ -116,6 +144,29 @@ export default function IngresoForm({
           {clientes.map((cliente) => (
             <option key={cliente.id} value={cliente.id}>
               {cliente.razonSocial}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div className="form-field">
+        <label>Envío asociado</label>
+
+        <select
+          value={envioId}
+          onChange={(e) => setEnvioId(e.target.value)}
+        >
+          <option value="">
+            Seleccionar envío
+          </option>
+
+          {enviosCliente.map((envio) => (
+            <option
+              key={envio.id}
+              value={envio.id}
+            >
+              {envio.materiales} · {envio.localidad} · $
+              {envio.tarifaContratante.toLocaleString("es-AR")}
             </option>
           ))}
         </select>

@@ -142,7 +142,7 @@ export default function ConfiguracionForm({
       </div>
 
       <div className="form-field">
-        <label>Tarifa mínima gremial</label>
+        <label>Tarifa referencia mercado</label>
         <input
           type="number"
           value={tarifaMinimaGremial}

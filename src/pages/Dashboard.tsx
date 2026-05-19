@@ -10,7 +10,7 @@ export default function Dashboard() {
       <h1 className="page-title">Dashboard</h1>
 
       <p className="page-description">
-        Vista ejecutiva conectada a ingresos, costos, ayudantes, vehículo y envíos.
+        Vista ejecutiva conectada a operación, ingresos, costos, cobranza y facturación.
       </p>
 
       <section className="grid grid-4">
@@ -21,54 +21,51 @@ export default function Dashboard() {
         />
 
         <KpiCard
-          label="Costos totales"
-          value={formatCurrency(resumen.costosTotales)}
-          note="Vehículo, ayudantes, comisiones y retenciones"
+          label="Ingresos netos"
+          value={formatCurrency(resumen.ingresosNetos)}
+          note="Después de comisiones y retenciones"
         />
 
         <KpiCard
-          label="Rentabilidad neta"
-          value={formatCurrency(resumen.rentabilidadNeta)}
-          note="Ingresos brutos menos costos"
+          label="Margen operativo"
+          value={formatCurrency(resumen.margenOperativo)}
+          note="Ingresos netos menos vehículo y ayudantes"
         />
 
         <KpiCard
-          label="Envíos"
-          value={resumen.totalEnvios}
-          note="Operaciones registradas"
+          label="Pendientes de cobro"
+          value={resumen.enviosPendientesDeCobro}
+          note="Entregados sin ingreso asociado"
+        />
+      </section>
+
+      <section className="grid grid-4" style={{ marginTop: 18 }}>
+        <KpiCard
+          label="Costos operativos"
+          value={formatCurrency(resumen.costosOperativos)}
+          note="Vehículo + ayudantes"
+        />
+
+        <KpiCard
+          label="Gastos vehículo"
+          value={formatCurrency(resumen.gastosVehiculoTotal)}
+          note="Combustible, mantenimiento, seguro y peajes"
+        />
+
+        <KpiCard
+          label="Pagos ayudantes"
+          value={formatCurrency(resumen.pagosAyudantesTotal)}
+          note="Horas y liquidaciones"
+        />
+
+        <KpiCard
+          label="Ticket promedio"
+          value={formatCurrency(resumen.ticketPromedio)}
+          note="Promedio por ingreso registrado"
         />
       </section>
 
       <section className="grid grid-2" style={{ marginTop: 18 }}>
-        <article className="card">
-          <h2>Resumen financiero</h2>
-
-          <div className="metric-row">
-            <span>Ingresos netos</span>
-            <strong>{formatCurrency(resumen.ingresosNetos)}</strong>
-          </div>
-
-          <div className="metric-row">
-            <span>Gastos vehículo</span>
-            <strong>{formatCurrency(resumen.gastosVehiculoTotal)}</strong>
-          </div>
-
-          <div className="metric-row">
-            <span>Pagos ayudantes</span>
-            <strong>{formatCurrency(resumen.pagosAyudantesTotal)}</strong>
-          </div>
-
-          <div className="metric-row">
-            <span>Comisiones</span>
-            <strong>{formatCurrency(resumen.comisiones)}</strong>
-          </div>
-
-          <div className="metric-row">
-            <span>Retenciones</span>
-            <strong>{formatCurrency(resumen.retenciones)}</strong>
-          </div>
-        </article>
-
         <article className="card">
           <h2>Estado operativo</h2>
 
@@ -88,14 +85,79 @@ export default function Dashboard() {
           </div>
 
           <div className="metric-row">
-            <span>Pendientes de cobro</span>
-            <strong>{resumen.enviosPendientesDeCobro}</strong>
+            <span>Cobrados</span>
+            <strong>{resumen.enviosCobrados}</strong>
           </div>
 
           <div className="metric-row">
-            <span>Clientes operativos</span>
-            <strong>{resumen.totalClientesOperativos}</strong>
+            <span>Cancelados</span>
+            <strong>{resumen.enviosCancelados}</strong>
           </div>
+
+          <div className="metric-row">
+            <span>Pendientes de cobro</span>
+            <strong>{resumen.enviosPendientesDeCobro}</strong>
+          </div>
+        </article>
+
+        <article className="card">
+          <h2>Lectura financiera</h2>
+
+          <div className="metric-row">
+            <span>Facturas emitidas</span>
+            <strong>{resumen.totalFacturas}</strong>
+          </div>
+
+          <div className="metric-row">
+            <span>Total facturado</span>
+            <strong>{formatCurrency(resumen.totalFacturado)}</strong>
+          </div>
+
+          <div className="metric-row">
+            <span>Comisiones</span>
+            <strong>{formatCurrency(resumen.comisiones)}</strong>
+          </div>
+
+          <div className="metric-row">
+            <span>Retenciones</span>
+            <strong>{formatCurrency(resumen.retenciones)}</strong>
+          </div>
+
+          <div className="metric-row">
+            <span>Rentabilidad neta</span>
+            <strong>{formatCurrency(resumen.rentabilidadNeta)}</strong>
+          </div>
+        </article>
+      </section>
+
+      <section className="grid grid-2" style={{ marginTop: 18 }}>
+        <article className="card">
+          <h2>Resumen comercial</h2>
+
+          <div className="metric-row">
+            <span>Clientes registrados</span>
+            <strong>{resumen.totalClientes}</strong>
+          </div>
+
+          <div className="metric-row">
+            <span>Clientes activos</span>
+            <strong>{resumen.clientesActivos}</strong>
+          </div>
+
+          <div className="metric-row">
+            <span>Total envíos</span>
+            <strong>{resumen.totalEnvios}</strong>
+          </div>
+        </article>
+
+        <article className="card">
+          <h2>Diagnóstico rápido</h2>
+
+          <p className="page-description">
+            Este panel resume si la operación está generando margen real, si hay
+            envíos entregados sin cobrar y cuánto representan los costos directos
+            del vehículo y ayudantes sobre la facturación.
+          </p>
         </article>
       </section>
     </>

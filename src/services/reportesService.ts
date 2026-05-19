@@ -1,14 +1,19 @@
-import { getEnvios } from "./enviosService";
-import { getGastosVehiculo } from "./vehiculoService";
 import { getPagosAyudantes } from "./ayudantesService";
-import { getIngresos } from "./ingresosService";
 import { getEnviosPendientesDeCobro } from "./cobranzaService";
+import { getClientes } from "./clientesService";
+import { getEnvios } from "./enviosService";
+import { getFacturas } from "./facturacionService";
+import { getIngresos } from "./ingresosService";
+import { getGastosVehiculo } from "./vehiculoService";
 
 export function getResumenFinanciero() {
   const envios = getEnvios();
   const ingresos = getIngresos();
+  const facturas = getFacturas();
+  const clientes = getClientes();
   const gastosVehiculo = getGastosVehiculo();
   const pagosAyudantes = getPagosAyudantes();
+  const enviosPendientesDeCobro = getEnviosPendientesDeCobro();
 
   const ingresosBrutos = ingresos.reduce(
     (total, ingreso) => total + ingreso.monto,
@@ -40,10 +45,22 @@ export function getResumenFinanciero() {
     0
   );
 
+  const costosOperativos = gastosVehiculoTotal + pagosAyudantesTotal;
+
   const costosTotales =
-    gastosVehiculoTotal + pagosAyudantesTotal + comisiones + retenciones;
+    costosOperativos + comisiones + retenciones;
+
+  const margenOperativo = ingresosNetos - costosOperativos;
 
   const rentabilidadNeta = ingresosBrutos - costosTotales;
+
+  const totalFacturado = facturas.reduce(
+    (total, factura) => total + factura.importeTotal,
+    0
+  );
+
+  const ticketPromedio =
+    ingresos.length > 0 ? ingresosBrutos / ingresos.length : 0;
 
   const enviosPendientes = envios.filter(
     (envio) => envio.estado === "PENDIENTE"
@@ -57,7 +74,19 @@ export function getResumenFinanciero() {
     (envio) => envio.estado === "ENTREGADO"
   ).length;
 
-  const enviosPendientesDeCobro = getEnviosPendientesDeCobro();
+  const enviosCobrados = envios.filter(
+    (envio) => envio.estado === "COBRADO"
+  ).length;
+
+  const enviosCancelados = envios.filter(
+    (envio) => envio.estado === "CANCELADO"
+  ).length;
+
+  const clientesActivos = new Set(
+    ingresos
+      .map((ingreso) => ingreso.clienteId)
+      .filter(Boolean)
+  ).size;
 
   return {
     ingresosBrutos,
@@ -66,15 +95,23 @@ export function getResumenFinanciero() {
     retenciones,
     gastosVehiculoTotal,
     pagosAyudantesTotal,
+    costosOperativos,
     costosTotales,
+    margenOperativo,
     rentabilidadNeta,
+    totalFacturado,
+    ticketPromedio,
+
     totalEnvios: envios.length,
     enviosPendientes,
-    enviosPendientesDeCobro: enviosPendientesDeCobro.length,
     enviosEnTransito,
     enviosEntregados,
-    totalClientesOperativos: new Set(
-      envios.map((envio) => envio.empresaCliente.trim().toLowerCase())
-    ).size,
+    enviosCobrados,
+    enviosCancelados,
+    enviosPendientesDeCobro: enviosPendientesDeCobro.length,
+
+    totalClientes: clientes.length,
+    clientesActivos,
+    totalFacturas: facturas.length,
   };
 }

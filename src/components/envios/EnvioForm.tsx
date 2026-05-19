@@ -1,7 +1,5 @@
 import { type FormEvent, useEffect, useState } from "react";
-
 import type { Cliente } from "../../domain/cliente";
-
 import { useConfiguracion } from "../../hooks/useConfiguracion";
 
 type EnvioFormProps = {
@@ -33,36 +31,23 @@ export default function EnvioForm({
 }: EnvioFormProps) {
   const { configuracion } = useConfiguracion();
 
-  const tarifaBase =
-    configuracion?.tarifas.tarifaMinimaGremial ?? 35000;
+  const tarifaMinimaGremialBase =
+    configuracion?.tarifas.tarifaMinimaGremial ?? 0;
 
   const [clienteId, setClienteId] = useState("");
-
   const [materiales, setMateriales] = useState("");
-
-  const [direccionDestino, setDireccionDestino] =
-    useState("");
-
+  const [direccionDestino, setDireccionDestino] = useState("");
   const [localidad, setLocalidad] = useState("");
-
-  const [provincia, setProvincia] =
-    useState("Buenos Aires");
-
+  const [provincia, setProvincia] = useState("Buenos Aires");
   const [tarifaGremial, setTarifaGremial] =
-    useState(tarifaBase);
-
-  const [tarifaContratante, setTarifaContratante] =
-    useState(0);
-
-  const [costoEstimado, setCostoEstimado] =
-    useState(0);
-
-  const [observaciones, setObservaciones] =
-    useState("");
+    useState(tarifaMinimaGremialBase);
+  const [tarifaContratante, setTarifaContratante] = useState(0);
+  const [costoEstimado, setCostoEstimado] = useState(0);
+  const [observaciones, setObservaciones] = useState("");
 
   useEffect(() => {
-    setTarifaGremial(tarifaBase);
-  }, [tarifaBase]);
+    setTarifaGremial(tarifaMinimaGremialBase);
+  }, [tarifaMinimaGremialBase]);
 
   function handleSubmit(event: FormEvent) {
     event.preventDefault();
@@ -87,53 +72,38 @@ export default function EnvioForm({
     }
 
     if (tarifaContratante <= 0) {
-      onError(
-        "La tarifa contratante debe ser mayor a cero."
-      );
+      onError("La tarifa contratante debe ser mayor a cero.");
+      return;
+    }
+
+    if (tarifaGremial < 0 || costoEstimado < 0) {
+      onError("La tarifa gremial y el costo estimado no pueden ser negativos.");
       return;
     }
 
     onSubmit({
       clienteId: clienteSeleccionado.id,
-
-      empresaCliente:
-        clienteSeleccionado.razonSocial,
-
+      empresaCliente: clienteSeleccionado.razonSocial,
       materiales,
-
       direccionDestino,
-
       localidad,
-
       provincia,
-
       tarifaGremial,
-
       tarifaContratante,
-
       costoEstimado,
-
       observaciones,
     });
 
     onSuccess("Envío registrado correctamente.");
 
     setClienteId("");
-
     setMateriales("");
-
     setDireccionDestino("");
-
     setLocalidad("");
-
     setProvincia("Buenos Aires");
-
-    setTarifaGremial(tarifaBase);
-
+    setTarifaGremial(tarifaMinimaGremialBase);
     setTarifaContratante(0);
-
     setCostoEstimado(0);
-
     setObservaciones("");
   }
 
@@ -144,19 +114,12 @@ export default function EnvioForm({
 
         <select
           value={clienteId}
-          onChange={(e) =>
-            setClienteId(e.target.value)
-          }
+          onChange={(e) => setClienteId(e.target.value)}
         >
-          <option value="">
-            Seleccionar cliente
-          </option>
+          <option value="">Seleccionar cliente</option>
 
           {clientes.map((cliente) => (
-            <option
-              key={cliente.id}
-              value={cliente.id}
-            >
+            <option key={cliente.id} value={cliente.id}>
               {cliente.razonSocial}
             </option>
           ))}
@@ -168,9 +131,7 @@ export default function EnvioForm({
 
         <input
           value={materiales}
-          onChange={(e) =>
-            setMateriales(e.target.value)
-          }
+          onChange={(e) => setMateriales(e.target.value)}
           placeholder="Ej: cajas, repuestos, herramientas"
         />
       </div>
@@ -180,9 +141,7 @@ export default function EnvioForm({
 
         <input
           value={direccionDestino}
-          onChange={(e) =>
-            setDireccionDestino(e.target.value)
-          }
+          onChange={(e) => setDireccionDestino(e.target.value)}
           placeholder="Ej: Av. Siempre Viva 123"
         />
       </div>
@@ -192,9 +151,7 @@ export default function EnvioForm({
 
         <input
           value={localidad}
-          onChange={(e) =>
-            setLocalidad(e.target.value)
-          }
+          onChange={(e) => setLocalidad(e.target.value)}
           placeholder="Ej: Caseros"
         />
       </div>
@@ -204,9 +161,7 @@ export default function EnvioForm({
 
         <input
           value={provincia}
-          onChange={(e) =>
-            setProvincia(e.target.value)
-          }
+          onChange={(e) => setProvincia(e.target.value)}
         />
       </div>
 
@@ -217,9 +172,7 @@ export default function EnvioForm({
           type="number"
           value={tarifaGremial}
           onChange={(e) =>
-            setTarifaGremial(
-              Number(e.target.value)
-            )
+            setTarifaGremial(Number(e.target.value))
           }
         />
       </div>
@@ -231,9 +184,7 @@ export default function EnvioForm({
           type="number"
           value={tarifaContratante}
           onChange={(e) =>
-            setTarifaContratante(
-              Number(e.target.value)
-            )
+            setTarifaContratante(Number(e.target.value))
           }
         />
       </div>
@@ -244,11 +195,7 @@ export default function EnvioForm({
         <input
           type="number"
           value={costoEstimado}
-          onChange={(e) =>
-            setCostoEstimado(
-              Number(e.target.value)
-            )
-          }
+          onChange={(e) => setCostoEstimado(Number(e.target.value))}
         />
       </div>
 
@@ -257,17 +204,12 @@ export default function EnvioForm({
 
         <textarea
           value={observaciones}
-          onChange={(e) =>
-            setObservaciones(e.target.value)
-          }
+          onChange={(e) => setObservaciones(e.target.value)}
           placeholder="Notas internas del viaje"
         />
       </div>
 
-      <button
-        className="primary-button"
-        type="submit"
-      >
+      <button className="primary-button" type="submit">
         Registrar envío
       </button>
     </form>

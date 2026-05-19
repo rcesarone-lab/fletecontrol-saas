@@ -69,7 +69,10 @@ export default function EnviosTable({
                   <select
                     value={envio.estado}
                     onChange={(e) =>
-                      onChangeEstado(envio.id, e.target.value as EstadoEnvio)
+                      onChangeEstado(
+                        envio.id,
+                        e.target.value as EstadoEnvio
+                      )
                     }
                   >
                     {estados.map((estado) => (

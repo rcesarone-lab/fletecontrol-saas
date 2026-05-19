@@ -1,8 +1,10 @@
 import EnvioForm from "../components/envios/EnvioForm";
 import EnviosTable from "../components/envios/EnviosTable";
+import { useClientes } from "../hooks/useClientes";
 import { useEnvios } from "../hooks/useEnvios";
 
 export default function Envios() {
+  const { clientes } = useClientes();
   const { envios, agregarEnvio, cambiarEstado, eliminarEnvio } = useEnvios();
 
   const pendientes = envios.filter((envio) => envio.estado === "PENDIENTE").length;
@@ -43,9 +45,19 @@ export default function Envios() {
         </article>
       </section>
 
-      <div style={{ marginTop: 18 }}>
-        <EnvioForm onSubmit={agregarEnvio} />
-      </div>
+      {clientes.length === 0 ? (
+        <section className="card" style={{ marginTop: 18 }}>
+          <h2>Primero registra un cliente</h2>
+          <p className="page-description">
+            Para registrar un envío, primero necesitás cargar al menos una empresa
+            cliente en el módulo Clientes.
+          </p>
+        </section>
+      ) : (
+        <div style={{ marginTop: 18 }}>
+          <EnvioForm clientes={clientes} onSubmit={agregarEnvio} />
+        </div>
+      )}
 
       <div style={{ marginTop: 18 }}>
         <EnviosTable

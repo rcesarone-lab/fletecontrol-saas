@@ -9,6 +9,7 @@ import {
 import { getToday } from "../utils/dates";
 
 type NuevoEnvioInput = {
+  clienteId: string;
   empresaCliente: string;
   materiales: string;
   direccionDestino: string;
@@ -36,19 +37,16 @@ export function useEnvios() {
     };
 
     const actualizados = saveEnvio(nuevoEnvio);
-
     setEnvios(actualizados);
   }
 
   function cambiarEstado(id: string, estado: EstadoEnvio) {
     const actualizados = updateEstadoEnvio(id, estado);
-
     setEnvios(actualizados);
   }
 
   function eliminarEnvio(id: string) {
     const actualizados = deleteEnvio(id);
-
     setEnvios(actualizados);
   }
 

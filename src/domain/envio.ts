@@ -6,25 +6,20 @@ export type EstadoEnvio =
 
 export type Envio = {
   id: string;
-
   fecha: string;
 
+  clienteId: string;
   empresaCliente: string;
 
   materiales: string;
-
   direccionDestino: string;
-
   localidad: string;
-
   provincia: string;
 
   estado: EstadoEnvio;
 
   tarifaGremial: number;
-
   tarifaContratante: number;
-
   costoEstimado: number;
 
   observaciones?: string;

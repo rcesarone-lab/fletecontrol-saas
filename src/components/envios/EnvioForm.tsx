@@ -1,7 +1,10 @@
-import { type FormEvent, useState } from "react";
+import { FormEvent, useState } from "react";
+import type { Cliente } from "../../domain/cliente";
 
 type EnvioFormProps = {
+  clientes: Cliente[];
   onSubmit: (data: {
+    clienteId: string;
     empresaCliente: string;
     materiales: string;
     direccionDestino: string;
@@ -14,8 +17,8 @@ type EnvioFormProps = {
   }) => void;
 };
 
-export default function EnvioForm({ onSubmit }: EnvioFormProps) {
-  const [empresaCliente, setEmpresaCliente] = useState("");
+export default function EnvioForm({ clientes, onSubmit }: EnvioFormProps) {
+  const [clienteId, setClienteId] = useState("");
   const [materiales, setMateriales] = useState("");
   const [direccionDestino, setDireccionDestino] = useState("");
   const [localidad, setLocalidad] = useState("");
@@ -28,13 +31,23 @@ export default function EnvioForm({ onSubmit }: EnvioFormProps) {
   function handleSubmit(event: FormEvent) {
     event.preventDefault();
 
-    if (!empresaCliente.trim() || !materiales.trim() || !direccionDestino.trim()) {
-      alert("Completá empresa, materiales y destino.");
+    const clienteSeleccionado = clientes.find(
+      (cliente) => cliente.id === clienteId
+    );
+
+    if (!clienteSeleccionado) {
+      alert("Seleccioná un cliente registrado.");
+      return;
+    }
+
+    if (!materiales.trim() || !direccionDestino.trim()) {
+      alert("Completá materiales y destino.");
       return;
     }
 
     onSubmit({
-      empresaCliente,
+      clienteId: clienteSeleccionado.id,
+      empresaCliente: clienteSeleccionado.razonSocial,
       materiales,
       direccionDestino,
       localidad,
@@ -45,7 +58,7 @@ export default function EnvioForm({ onSubmit }: EnvioFormProps) {
       observaciones,
     });
 
-    setEmpresaCliente("");
+    setClienteId("");
     setMateriales("");
     setDireccionDestino("");
     setLocalidad("");
@@ -59,12 +72,18 @@ export default function EnvioForm({ onSubmit }: EnvioFormProps) {
   return (
     <form className="card form-grid" onSubmit={handleSubmit}>
       <div className="form-field">
-        <label>Empresa solicitante</label>
-        <input
-          value={empresaCliente}
-          onChange={(e) => setEmpresaCliente(e.target.value)}
-          placeholder="Ej: Empresa ABC"
-        />
+        <label>Cliente registrado</label>
+        <select
+          value={clienteId}
+          onChange={(e) => setClienteId(e.target.value)}
+        >
+          <option value="">Seleccionar cliente</option>
+          {clientes.map((cliente) => (
+            <option key={cliente.id} value={cliente.id}>
+              {cliente.razonSocial}
+            </option>
+          ))}
+        </select>
       </div>
 
       <div className="form-field">

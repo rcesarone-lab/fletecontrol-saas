@@ -1,4 +1,4 @@
-import { type FormEvent, useMemo, useState } from "react";
+import { FormEvent, useMemo, useState } from "react";
 import type { Cliente } from "../../domain/cliente";
 import type { EstadoCobro, MetodoCobro } from "../../domain/ingreso";
 
@@ -6,7 +6,10 @@ type IngresoFormProps = {
   clientes: Cliente[];
 
   onSubmit: (data: {
+    clienteId?: string;
     cliente: string;
+    clienteCuit?: string;
+    clienteDireccion?: string;
     concepto: string;
     monto: number;
     metodoCobro: MetodoCobro;
@@ -45,16 +48,16 @@ export default function IngresoForm({
   const [estado, setEstado] = useState<EstadoCobro>("COBRADO");
   const [facturaEmitida, setFacturaEmitida] = useState(true);
 
+  const clienteSeleccionado = clientes.find(
+    (cliente) => cliente.id === clienteId
+  );
+
   const montoNeto = useMemo(() => {
     return monto - comision - retencion;
   }, [monto, comision, retencion]);
 
   function handleSubmit(event: FormEvent) {
     event.preventDefault();
-
-    const clienteSeleccionado = clientes.find(
-      (cliente) => cliente.id === clienteId
-    );
 
     if (!clienteSeleccionado) {
       onError("Seleccioná un cliente registrado.");
@@ -77,7 +80,10 @@ export default function IngresoForm({
     }
 
     onSubmit({
+      clienteId: clienteSeleccionado.id,
       cliente: clienteSeleccionado.razonSocial,
+      clienteCuit: clienteSeleccionado.cuit,
+      clienteDireccion: clienteSeleccionado.direccion,
       concepto,
       monto,
       metodoCobro,
@@ -114,6 +120,16 @@ export default function IngresoForm({
           ))}
         </select>
       </div>
+
+      {clienteSeleccionado && (
+        <article className="card">
+          <div className="card-label">Datos fiscales del cliente</div>
+          <div className="card-note">
+            CUIT: {clienteSeleccionado.cuit || "Pendiente"} · Dirección:{" "}
+            {clienteSeleccionado.direccion || "Pendiente"}
+          </div>
+        </article>
+      )}
 
       <div className="form-field">
         <label>Concepto</label>

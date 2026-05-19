@@ -10,7 +10,10 @@ import {
 import { getToday } from "../utils/dates";
 
 type NuevoIngresoInput = {
+  clienteId?: string;
   cliente: string;
+  clienteCuit?: string;
+  clienteDireccion?: string;
   concepto: string;
   monto: number;
   metodoCobro: MetodoCobro;
@@ -33,15 +36,26 @@ export function useIngresos() {
     const nuevoIngreso: Ingreso = {
       id: crypto.randomUUID(),
       fecha: getToday(),
+      clienteId: input.clienteId,
+      cliente: input.cliente,
+      concepto: input.concepto,
+      monto: input.monto,
+      metodoCobro: input.metodoCobro,
+      comision: input.comision,
+      retencion: input.retencion,
       montoNeto,
-      ...input,
+      estado: input.estado,
+      facturaEmitida: input.facturaEmitida,
     };
 
     const actualizados = saveIngreso(nuevoIngreso);
 
     if (input.facturaEmitida) {
       emitirFacturaSimulada({
+        clienteId: input.clienteId,
         cliente: input.cliente,
+        clienteCuit: input.clienteCuit,
+        clienteDireccion: input.clienteDireccion,
         importeTotal: input.monto,
         configuracion: getConfiguracion(),
       });

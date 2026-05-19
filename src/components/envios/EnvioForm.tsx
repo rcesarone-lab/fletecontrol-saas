@@ -1,4 +1,4 @@
-import { FormEvent, useState } from "react";
+import { type FormEvent, useState } from "react";
 import type { Cliente } from "../../domain/cliente";
 
 type EnvioFormProps = {
@@ -15,9 +15,16 @@ type EnvioFormProps = {
     costoEstimado: number;
     observaciones?: string;
   }) => void;
+  onError: (message: string) => void;
+  onSuccess: (message: string) => void;
 };
 
-export default function EnvioForm({ clientes, onSubmit }: EnvioFormProps) {
+export default function EnvioForm({
+  clientes,
+  onSubmit,
+  onError,
+  onSuccess,
+}: EnvioFormProps) {
   const [clienteId, setClienteId] = useState("");
   const [materiales, setMateriales] = useState("");
   const [direccionDestino, setDireccionDestino] = useState("");
@@ -36,12 +43,17 @@ export default function EnvioForm({ clientes, onSubmit }: EnvioFormProps) {
     );
 
     if (!clienteSeleccionado) {
-      alert("Seleccioná un cliente registrado.");
+      onError("Seleccioná un cliente registrado.");
       return;
     }
 
     if (!materiales.trim() || !direccionDestino.trim()) {
-      alert("Completá materiales y destino.");
+      onError("Completá materiales y destino.");
+      return;
+    }
+
+    if (tarifaContratante <= 0) {
+      onError("La tarifa contratante debe ser mayor a cero.");
       return;
     }
 
@@ -58,6 +70,8 @@ export default function EnvioForm({ clientes, onSubmit }: EnvioFormProps) {
       observaciones,
     });
 
+    onSuccess("Envío registrado correctamente.");
+
     setClienteId("");
     setMateriales("");
     setDireccionDestino("");
@@ -73,10 +87,7 @@ export default function EnvioForm({ clientes, onSubmit }: EnvioFormProps) {
     <form className="card form-grid" onSubmit={handleSubmit}>
       <div className="form-field">
         <label>Cliente registrado</label>
-        <select
-          value={clienteId}
-          onChange={(e) => setClienteId(e.target.value)}
-        >
+        <select value={clienteId} onChange={(e) => setClienteId(e.target.value)}>
           <option value="">Seleccionar cliente</option>
           {clientes.map((cliente) => (
             <option key={cliente.id} value={cliente.id}>
@@ -115,10 +126,7 @@ export default function EnvioForm({ clientes, onSubmit }: EnvioFormProps) {
 
       <div className="form-field">
         <label>Provincia</label>
-        <input
-          value={provincia}
-          onChange={(e) => setProvincia(e.target.value)}
-        />
+        <input value={provincia} onChange={(e) => setProvincia(e.target.value)} />
       </div>
 
       <div className="form-field">

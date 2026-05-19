@@ -1,9 +1,12 @@
 import ClienteForm from "../components/clientes/ClienteForm";
 import ClientesTable from "../components/clientes/ClientesTable";
+import Toast from "../components/ui/Toast";
 import { useClientes } from "../hooks/useClientes";
+import { useToast } from "../hooks/useToast";
 
 export default function Clientes() {
   const { clientes, agregarCliente, eliminarCliente } = useClientes();
+  const { message, type, showToast, clearToast } = useToast();
 
   return (
     <>
@@ -50,12 +53,18 @@ export default function Clientes() {
       </section>
 
       <div style={{ marginTop: 18 }}>
-        <ClienteForm onSubmit={agregarCliente} />
+        <ClienteForm
+          onSubmit={agregarCliente}
+          onError={(msg) => showToast(msg, "error")}
+          onSuccess={(msg) => showToast(msg, "success")}
+        />
       </div>
 
       <div style={{ marginTop: 18 }}>
         <ClientesTable clientes={clientes} onDelete={eliminarCliente} />
       </div>
+
+      <Toast message={message} type={type} onClose={clearToast} />
     </>
   );
 }

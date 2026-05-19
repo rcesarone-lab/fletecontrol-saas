@@ -9,9 +9,15 @@ type ClienteFormProps = {
     email?: string;
     direccion?: string;
   }) => void;
+  onError: (message: string) => void;
+  onSuccess: (message: string) => void;
 };
 
-export default function ClienteForm({ onSubmit }: ClienteFormProps) {
+export default function ClienteForm({
+  onSubmit,
+  onError,
+  onSuccess,
+}: ClienteFormProps) {
   const [razonSocial, setRazonSocial] = useState("");
   const [cuit, setCuit] = useState("");
   const [contacto, setContacto] = useState("");
@@ -23,7 +29,7 @@ export default function ClienteForm({ onSubmit }: ClienteFormProps) {
     event.preventDefault();
 
     if (!razonSocial.trim()) {
-      alert("Completá la razón social del cliente.");
+      onError("Completá la razón social del cliente.");
       return;
     }
 
@@ -35,6 +41,8 @@ export default function ClienteForm({ onSubmit }: ClienteFormProps) {
       email,
       direccion,
     });
+
+    onSuccess("Cliente registrado correctamente.");
 
     setRazonSocial("");
     setCuit("");

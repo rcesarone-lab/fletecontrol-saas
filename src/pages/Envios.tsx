@@ -1,11 +1,15 @@
 import EnvioForm from "../components/envios/EnvioForm";
 import EnviosTable from "../components/envios/EnviosTable";
+import Toast from "../components/ui/Toast";
 import { useClientes } from "../hooks/useClientes";
 import { useEnvios } from "../hooks/useEnvios";
+import { useToast } from "../hooks/useToast";
 
 export default function Envios() {
   const { clientes } = useClientes();
   const { envios, agregarEnvio, cambiarEstado, eliminarEnvio } = useEnvios();
+
+  const { message, type, showToast, clearToast } = useToast();
 
   const pendientes = envios.filter((envio) => envio.estado === "PENDIENTE").length;
   const enTransito = envios.filter((envio) => envio.estado === "EN_TRANSITO").length;
@@ -55,7 +59,12 @@ export default function Envios() {
         </section>
       ) : (
         <div style={{ marginTop: 18 }}>
-          <EnvioForm clientes={clientes} onSubmit={agregarEnvio} />
+          <EnvioForm
+            clientes={clientes}
+            onSubmit={agregarEnvio}
+            onError={(msg) => showToast(msg, "error")}
+            onSuccess={(msg) => showToast(msg, "success")}
+          />
         </div>
       )}
 
@@ -66,6 +75,8 @@ export default function Envios() {
           onDelete={eliminarEnvio}
         />
       </div>
+
+      <Toast message={message} type={type} onClose={clearToast} />
     </>
   );
 }

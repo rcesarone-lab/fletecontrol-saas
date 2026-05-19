@@ -3,6 +3,7 @@ import type { Envio } from '../domain/envio'
 export const seedEnvios: Envio[] = [
   {
     id: 'e1',
+    clienteId: 'c1',
     empresaCliente: 'Cliente Uno',
     materiales: 'Carga general',
     direccionDestino: 'Destino A',

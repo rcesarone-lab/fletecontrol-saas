@@ -7,6 +7,7 @@ import {
   getIngresos,
   saveIngreso,
 } from "../services/ingresosService";
+import { updateEstadoEnvio } from "../services/enviosService";
 import { getToday } from "../utils/dates";
 
 type NuevoIngresoInput = {
@@ -14,6 +15,7 @@ type NuevoIngresoInput = {
   cliente: string;
   clienteCuit?: string;
   clienteDireccion?: string;
+  envioId?: string;
   concepto: string;
   monto: number;
   metodoCobro: MetodoCobro;
@@ -38,6 +40,7 @@ export function useIngresos() {
       fecha: getToday(),
       clienteId: input.clienteId,
       cliente: input.cliente,
+      envioId: input.envioId,
       concepto: input.concepto,
       monto: input.monto,
       metodoCobro: input.metodoCobro,
@@ -59,6 +62,10 @@ export function useIngresos() {
         importeTotal: input.monto,
         configuracion: getConfiguracion(),
       });
+    }
+
+    if (input.envioId && input.estado === "COBRADO") {
+      updateEstadoEnvio(input.envioId, "COBRADO");
     }
 
     setIngresos(actualizados);

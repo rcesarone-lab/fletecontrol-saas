@@ -1,24 +1,15 @@
 import IngresoForm from "../components/ingresos/IngresoForm";
-
 import IngresosTable from "../components/ingresos/IngresosTable";
-
 import Toast from "../components/ui/Toast";
-
+import { useClientes } from "../hooks/useClientes";
 import { useIngresos } from "../hooks/useIngresos";
-
 import { useToast } from "../hooks/useToast";
-
 import { formatCurrency } from "../utils/currency";
 
 export default function IngresosFacturacion() {
-  const {
-    ingresos,
-    agregarIngreso,
-    eliminarIngreso,
-  } = useIngresos();
-
-  const { message, type, showToast, clearToast } =
-    useToast();
+  const { clientes } = useClientes();
+  const { ingresos, agregarIngreso, eliminarIngreso } = useIngresos();
+  const { message, type, showToast, clearToast } = useToast();
 
   const totalBruto = ingresos.reduce(
     (total, ingreso) => total + ingreso.monto,
@@ -42,97 +33,62 @@ export default function IngresosFacturacion() {
 
   return (
     <>
-      <h1 className="page-title">
-        Ingresos y Facturación
-      </h1>
+      <h1 className="page-title">Ingresos y Facturación</h1>
 
       <p className="page-description">
-        Control de cobros, conciliación financiera y
-        facturación simulada.
+        Control de cobros, conciliación financiera y facturación simulada.
       </p>
 
       <section className="grid grid-4">
         <article className="card">
-          <div className="card-label">
-            Ingresos brutos
-          </div>
-
-          <div className="card-value">
-            {formatCurrency(totalBruto)}
-          </div>
-
-          <div className="card-note">
-            Total facturado
-          </div>
+          <div className="card-label">Ingresos brutos</div>
+          <div className="card-value">{formatCurrency(totalBruto)}</div>
+          <div className="card-note">Total facturado</div>
         </article>
 
         <article className="card">
-          <div className="card-label">
-            Comisiones
-          </div>
-
-          <div className="card-value">
-            {formatCurrency(totalComisiones)}
-          </div>
-
-          <div className="card-note">
-            MercadoPago y otros
-          </div>
+          <div className="card-label">Comisiones</div>
+          <div className="card-value">{formatCurrency(totalComisiones)}</div>
+          <div className="card-note">MercadoPago y otros</div>
         </article>
 
         <article className="card">
-          <div className="card-label">
-            Retenciones
-          </div>
-
-          <div className="card-value">
-            {formatCurrency(totalRetenciones)}
-          </div>
-
-          <div className="card-note">
-            Bancarias o impositivas
-          </div>
+          <div className="card-label">Retenciones</div>
+          <div className="card-value">{formatCurrency(totalRetenciones)}</div>
+          <div className="card-note">Bancarias o impositivas</div>
         </article>
 
         <article className="card">
-          <div className="card-label">
-            Neto real
-          </div>
-
-          <div className="card-value">
-            {formatCurrency(totalNeto)}
-          </div>
-
-          <div className="card-note">
-            Ingreso disponible
-          </div>
+          <div className="card-label">Neto real</div>
+          <div className="card-value">{formatCurrency(totalNeto)}</div>
+          <div className="card-note">Ingreso disponible</div>
         </article>
       </section>
 
-      <div style={{ marginTop: 18 }}>
-        <IngresoForm
-          onSubmit={agregarIngreso}
-          onError={(msg) =>
-            showToast(msg, "error")
-          }
-          onSuccess={(msg) =>
-            showToast(msg, "success")
-          }
-        />
-      </div>
+      {clientes.length === 0 ? (
+        <section className="card" style={{ marginTop: 18 }}>
+          <h2>Primero registra un cliente</h2>
+          <p className="page-description">
+            Para registrar ingresos o emitir una factura simulada, primero
+            necesitás cargar al menos una empresa cliente en el módulo Clientes.
+          </p>
+        </section>
+      ) : (
+        <div style={{ marginTop: 18 }}>
+          <IngresoForm
+            clientes={clientes}
+            onSubmit={agregarIngreso}
+            onError={(msg) => showToast(msg, "error")}
+            onSuccess={(msg) => showToast(msg, "success")}
+          />
+        </div>
+      )}
 
       <div style={{ marginTop: 18 }}>
-        <IngresosTable
-          ingresos={ingresos}
-          onDelete={eliminarIngreso}
-        />
+        <IngresosTable ingresos={ingresos} onDelete={eliminarIngreso} />
       </div>
 
-      <Toast
-        message={message}
-        type={type}
-        onClose={clearToast}
-      />
+      <Toast message={message} type={type} onClose={clearToast} />
     </>
   );
 }

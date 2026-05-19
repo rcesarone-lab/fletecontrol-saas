@@ -1,11 +1,10 @@
 import { type FormEvent, useMemo, useState } from "react";
-
-import type {
-  EstadoCobro,
-  MetodoCobro,
-} from "../../domain/ingreso";
+import type { Cliente } from "../../domain/cliente";
+import type { EstadoCobro, MetodoCobro } from "../../domain/ingreso";
 
 type IngresoFormProps = {
+  clientes: Cliente[];
+
   onSubmit: (data: {
     cliente: string;
     concepto: string;
@@ -18,7 +17,6 @@ type IngresoFormProps = {
   }) => void;
 
   onError: (message: string) => void;
-
   onSuccess: (message: string) => void;
 };
 
@@ -29,34 +27,23 @@ const metodos: MetodoCobro[] = [
   "CHEQUE",
 ];
 
-const estados: EstadoCobro[] = [
-  "PENDIENTE",
-  "COBRADO",
-];
+const estados: EstadoCobro[] = ["PENDIENTE", "COBRADO"];
 
 export default function IngresoForm({
+  clientes,
   onSubmit,
   onError,
   onSuccess,
 }: IngresoFormProps) {
-  const [cliente, setCliente] = useState("");
-
+  const [clienteId, setClienteId] = useState("");
   const [concepto, setConcepto] = useState("");
-
   const [monto, setMonto] = useState(0);
-
   const [metodoCobro, setMetodoCobro] =
     useState<MetodoCobro>("TRANSFERENCIA");
-
   const [comision, setComision] = useState(0);
-
   const [retencion, setRetencion] = useState(0);
-
-  const [estado, setEstado] =
-    useState<EstadoCobro>("COBRADO");
-
-  const [facturaEmitida, setFacturaEmitida] =
-    useState(true);
+  const [estado, setEstado] = useState<EstadoCobro>("COBRADO");
+  const [facturaEmitida, setFacturaEmitida] = useState(true);
 
   const montoNeto = useMemo(() => {
     return monto - comision - retencion;
@@ -65,8 +52,12 @@ export default function IngresoForm({
   function handleSubmit(event: FormEvent) {
     event.preventDefault();
 
-    if (!cliente.trim()) {
-      onError("Completá el cliente.");
+    const clienteSeleccionado = clientes.find(
+      (cliente) => cliente.id === clienteId
+    );
+
+    if (!clienteSeleccionado) {
+      onError("Seleccioná un cliente registrado.");
       return;
     }
 
@@ -80,8 +71,13 @@ export default function IngresoForm({
       return;
     }
 
+    if (comision < 0 || retencion < 0) {
+      onError("Comisión y retención no pueden ser negativas.");
+      return;
+    }
+
     onSubmit({
-      cliente,
+      cliente: clienteSeleccionado.razonSocial,
       concepto,
       monto,
       metodoCobro,
@@ -93,7 +89,7 @@ export default function IngresoForm({
 
     onSuccess("Ingreso registrado correctamente.");
 
-    setCliente("");
+    setClienteId("");
     setConcepto("");
     setMonto(0);
     setMetodoCobro("TRANSFERENCIA");
@@ -106,13 +102,17 @@ export default function IngresoForm({
   return (
     <form className="card form-grid" onSubmit={handleSubmit}>
       <div className="form-field">
-        <label>Cliente</label>
+        <label>Cliente registrado</label>
 
-        <input
-          value={cliente}
-          onChange={(e) => setCliente(e.target.value)}
-          placeholder="Ej: Empresa ABC"
-        />
+        <select value={clienteId} onChange={(e) => setClienteId(e.target.value)}>
+          <option value="">Seleccionar cliente</option>
+
+          {clientes.map((cliente) => (
+            <option key={cliente.id} value={cliente.id}>
+              {cliente.razonSocial}
+            </option>
+          ))}
+        </select>
       </div>
 
       <div className="form-field">
@@ -140,9 +140,7 @@ export default function IngresoForm({
 
         <select
           value={metodoCobro}
-          onChange={(e) =>
-            setMetodoCobro(e.target.value as MetodoCobro)
-          }
+          onChange={(e) => setMetodoCobro(e.target.value as MetodoCobro)}
         >
           {metodos.map((metodo) => (
             <option key={metodo} value={metodo}>
@@ -158,9 +156,7 @@ export default function IngresoForm({
         <input
           type="number"
           value={comision}
-          onChange={(e) =>
-            setComision(Number(e.target.value))
-          }
+          onChange={(e) => setComision(Number(e.target.value))}
         />
       </div>
 
@@ -170,9 +166,7 @@ export default function IngresoForm({
         <input
           type="number"
           value={retencion}
-          onChange={(e) =>
-            setRetencion(Number(e.target.value))
-          }
+          onChange={(e) => setRetencion(Number(e.target.value))}
         />
       </div>
 
@@ -181,9 +175,7 @@ export default function IngresoForm({
 
         <select
           value={estado}
-          onChange={(e) =>
-            setEstado(e.target.value as EstadoCobro)
-          }
+          onChange={(e) => setEstado(e.target.value as EstadoCobro)}
         >
           {estados.map((estadoItem) => (
             <option key={estadoItem} value={estadoItem}>
@@ -198,9 +190,7 @@ export default function IngresoForm({
 
         <select
           value={String(facturaEmitida)}
-          onChange={(e) =>
-            setFacturaEmitida(e.target.value === "true")
-          }
+          onChange={(e) => setFacturaEmitida(e.target.value === "true")}
         >
           <option value="true">Sí</option>
           <option value="false">No</option>
@@ -214,9 +204,7 @@ export default function IngresoForm({
           ${montoNeto.toLocaleString("es-AR")}
         </div>
 
-        <div className="card-note">
-          Bruto menos comisiones y retenciones
-        </div>
+        <div className="card-note">Bruto menos comisiones y retenciones</div>
       </article>
 
       <button className="primary-button" type="submit">

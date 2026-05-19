@@ -1,8 +1,14 @@
+import { useState } from "react";
+
 import AyudanteForm from "../components/ayudantes/AyudanteForm";
 import PagosAyudanteTable from "../components/ayudantes/PagosAyudanteTable";
+
+import ConfirmModal from "../components/ui/ConfirmModal";
 import Toast from "../components/ui/Toast";
+
 import { useAyudantes } from "../hooks/useAyudantes";
 import { useToast } from "../hooks/useToast";
+
 import { formatCurrency } from "../utils/currency";
 
 export default function Ayudantes() {
@@ -10,10 +16,9 @@ export default function Ayudantes() {
 
   const { message, type, showToast, clearToast } = useToast();
 
-  const totalPagado = pagos.reduce(
-    (total, pago) => total + pago.monto,
-    0
-  );
+  const [pagoAEliminar, setPagoAEliminar] = useState<string | null>(null);
+
+  const totalPagado = pagos.reduce((total, pago) => total + pago.monto, 0);
 
   const totalHoras = pagos.reduce(
     (total, pago) => total + pago.horasTrabajadas,
@@ -25,10 +30,20 @@ export default function Ayudantes() {
   ).length;
 
   const ayudantesUnicos = new Set(
-    pagos.map((pago) =>
-      pago.ayudanteNombre.trim().toLowerCase()
-    )
+    pagos.map((pago) => pago.ayudanteNombre.trim().toLowerCase())
   ).size;
+
+  function confirmarEliminacion() {
+    if (!pagoAEliminar) return;
+
+    eliminarPago(pagoAEliminar);
+    setPagoAEliminar(null);
+    showToast("Pago eliminado correctamente.", "success");
+  }
+
+  function cancelarEliminacion() {
+    setPagoAEliminar(null);
+  }
 
   return (
     <>
@@ -41,50 +56,26 @@ export default function Ayudantes() {
       <section className="grid grid-4">
         <article className="card">
           <div className="card-label">Total pagado</div>
-
-          <div className="card-value">
-            {formatCurrency(totalPagado)}
-          </div>
-
-          <div className="card-note">
-            Costo humano registrado
-          </div>
+          <div className="card-value">{formatCurrency(totalPagado)}</div>
+          <div className="card-note">Costo humano registrado</div>
         </article>
 
         <article className="card">
           <div className="card-label">Horas trabajadas</div>
-
-          <div className="card-value">
-            {totalHoras}
-          </div>
-
-          <div className="card-note">
-            Acumulado operativo
-          </div>
+          <div className="card-value">{totalHoras}</div>
+          <div className="card-note">Acumulado operativo</div>
         </article>
 
         <article className="card">
           <div className="card-label">Ayudantes únicos</div>
-
-          <div className="card-value">
-            {ayudantesUnicos}
-          </div>
-
-          <div className="card-note">
-            Personas registradas
-          </div>
+          <div className="card-value">{ayudantesUnicos}</div>
+          <div className="card-note">Personas registradas</div>
         </article>
 
         <article className="card">
           <div className="card-label">Transferencias</div>
-
-          <div className="card-value">
-            {pagosTransferencia}
-          </div>
-
-          <div className="card-note">
-            Pagos bancarizados
-          </div>
+          <div className="card-value">{pagosTransferencia}</div>
+          <div className="card-note">Pagos bancarizados</div>
         </article>
       </section>
 
@@ -99,14 +90,20 @@ export default function Ayudantes() {
       <div style={{ marginTop: 18 }}>
         <PagosAyudanteTable
           pagos={pagos}
-          onDelete={eliminarPago}
+          onDelete={(id) => setPagoAEliminar(id)}
         />
       </div>
 
-      <Toast
-        message={message}
-        type={type}
-        onClose={clearToast}
+      <Toast message={message} type={type} onClose={clearToast} />
+
+      <ConfirmModal
+        open={Boolean(pagoAEliminar)}
+        title="Eliminar pago"
+        message="Esta acción eliminará el pago seleccionado del historial de ayudantes. ¿Deseás continuar?"
+        confirmText="Eliminar"
+        cancelText="Cancelar"
+        onConfirm={confirmarEliminacion}
+        onCancel={cancelarEliminacion}
       />
     </>
   );

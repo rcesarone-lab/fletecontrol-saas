@@ -1,5 +1,7 @@
+import { useState } from "react";
 import ClienteForm from "../components/clientes/ClienteForm";
 import ClientesTable from "../components/clientes/ClientesTable";
+import ConfirmModal from "../components/ui/ConfirmModal";
 import Toast from "../components/ui/Toast";
 import { useClientes } from "../hooks/useClientes";
 import { useToast } from "../hooks/useToast";
@@ -7,6 +9,20 @@ import { useToast } from "../hooks/useToast";
 export default function Clientes() {
   const { clientes, agregarCliente, eliminarCliente } = useClientes();
   const { message, type, showToast, clearToast } = useToast();
+
+  const [clienteAEliminar, setClienteAEliminar] = useState<string | null>(null);
+
+  function confirmarEliminacion() {
+    if (!clienteAEliminar) return;
+
+    eliminarCliente(clienteAEliminar);
+    setClienteAEliminar(null);
+    showToast("Cliente eliminado correctamente.", "success");
+  }
+
+  function cancelarEliminacion() {
+    setClienteAEliminar(null);
+  }
 
   return (
     <>
@@ -61,10 +77,23 @@ export default function Clientes() {
       </div>
 
       <div style={{ marginTop: 18 }}>
-        <ClientesTable clientes={clientes} onDelete={eliminarCliente} />
+        <ClientesTable
+          clientes={clientes}
+          onDelete={(id) => setClienteAEliminar(id)}
+        />
       </div>
 
       <Toast message={message} type={type} onClose={clearToast} />
+
+      <ConfirmModal
+        open={Boolean(clienteAEliminar)}
+        title="Eliminar cliente"
+        message="Esta acción eliminará el cliente seleccionado. Si tiene envíos o ingresos asociados, podrían quedar referencias históricas. ¿Deseás continuar?"
+        confirmText="Eliminar"
+        cancelText="Cancelar"
+        onConfirm={confirmarEliminacion}
+        onCancel={cancelarEliminacion}
+      />
     </>
   );
 }

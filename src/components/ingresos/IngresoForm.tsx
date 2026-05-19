@@ -1,4 +1,4 @@
-import { FormEvent, useMemo, useState } from "react";
+import { type FormEvent, useMemo, useState } from "react";
 import type { Cliente } from "../../domain/cliente";
 import type { EstadoCobro, MetodoCobro } from "../../domain/ingreso";
 

@@ -2,6 +2,7 @@ import { getEnvios } from "./enviosService";
 import { getGastosVehiculo } from "./vehiculoService";
 import { getPagosAyudantes } from "./ayudantesService";
 import { getIngresos } from "./ingresosService";
+import { getEnviosPendientesDeCobro } from "./cobranzaService";
 
 export function getResumenFinanciero() {
   const envios = getEnvios();
@@ -56,6 +57,8 @@ export function getResumenFinanciero() {
     (envio) => envio.estado === "ENTREGADO"
   ).length;
 
+  const enviosPendientesDeCobro = getEnviosPendientesDeCobro();
+
   return {
     ingresosBrutos,
     ingresosNetos,
@@ -67,6 +70,7 @@ export function getResumenFinanciero() {
     rentabilidadNeta,
     totalEnvios: envios.length,
     enviosPendientes,
+    enviosPendientesDeCobro: enviosPendientesDeCobro.length,
     enviosEnTransito,
     enviosEntregados,
     totalClientesOperativos: new Set(

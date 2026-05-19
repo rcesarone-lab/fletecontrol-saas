@@ -88,6 +88,11 @@ export default function Dashboard() {
           </div>
 
           <div className="metric-row">
+            <span>Pendientes de cobro</span>
+            <strong>{resumen.enviosPendientesDeCobro}</strong>
+          </div>
+
+          <div className="metric-row">
             <span>Clientes operativos</span>
             <strong>{resumen.totalClientesOperativos}</strong>
           </div>

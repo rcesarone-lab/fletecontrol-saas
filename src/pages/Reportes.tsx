@@ -1,10 +1,12 @@
 import { getEnvios } from "../services/enviosService";
 import { getResumenFinanciero } from "../services/reportesService";
 import { formatCurrency } from "../utils/currency";
+import { getEnviosPendientesDeCobro } from "../services/cobranzaService";
 
 export default function Reportes() {
   const resumen = getResumenFinanciero();
   const envios = getEnvios();
+  const pendientesCobro = getEnviosPendientesDeCobro();
 
   const rentabilidadEnvios = envios.map((envio) => ({
     id: envio.id,
@@ -83,6 +85,52 @@ export default function Reportes() {
                     <td>{formatCurrency(item.diferenciaGremio)}</td>
                     <td>{formatCurrency(item.costoEstimado)}</td>
                     <td>{formatCurrency(item.rentabilidad)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
+
+      <section className="card table-card" style={{ marginTop: 18 }}>
+        <h2>Envíos entregados pendientes de cobro</h2>
+
+        {pendientesCobro.length === 0 ? (
+          <div className="placeholder">
+            No hay envíos entregados pendientes de cobro.
+          </div>
+        ) : (
+          <div className="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Fecha</th>
+                  <th>Cliente</th>
+                  <th>Materiales</th>
+                  <th>Destino</th>
+                  <th>Tarifa contratante</th>
+                  <th>Costo estimado</th>
+                  <th>Margen estimado</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {pendientesCobro.map((envio) => (
+                  <tr key={envio.id}>
+                    <td>{envio.fecha}</td>
+                    <td>{envio.empresaCliente}</td>
+                    <td>{envio.materiales}</td>
+                    <td>
+                      {envio.localidad}, {envio.provincia}
+                    </td>
+                    <td>{formatCurrency(envio.tarifaContratante)}</td>
+                    <td>{formatCurrency(envio.costoEstimado)}</td>
+                    <td>
+                      {formatCurrency(
+                        envio.tarifaContratante - envio.costoEstimado
+                      )}
+                    </td>
                   </tr>
                 ))}
               </tbody>

@@ -1,0 +1,209 @@
+import { FormEvent, useMemo, useState } from "react";
+
+import type {
+  EstadoCobro,
+  MetodoCobro,
+} from "../../domain/ingreso";
+
+type IngresoFormProps = {
+  onSubmit: (data: {
+    cliente: string;
+    concepto: string;
+    monto: number;
+    metodoCobro: MetodoCobro;
+    comision: number;
+    retencion: number;
+    estado: EstadoCobro;
+    facturaEmitida: boolean;
+  }) => void;
+};
+
+const metodos: MetodoCobro[] = [
+  "EFECTIVO",
+  "TRANSFERENCIA",
+  "MERCADOPAGO",
+  "CHEQUE",
+];
+
+const estados: EstadoCobro[] = [
+  "PENDIENTE",
+  "COBRADO",
+];
+
+export default function IngresoForm({
+  onSubmit,
+}: IngresoFormProps) {
+  const [cliente, setCliente] = useState("");
+
+  const [concepto, setConcepto] = useState("");
+
+  const [monto, setMonto] = useState(0);
+
+  const [metodoCobro, setMetodoCobro] =
+    useState<MetodoCobro>("TRANSFERENCIA");
+
+  const [comision, setComision] = useState(0);
+
+  const [retencion, setRetencion] = useState(0);
+
+  const [estado, setEstado] =
+    useState<EstadoCobro>("COBRADO");
+
+  const [facturaEmitida, setFacturaEmitida] =
+    useState(true);
+
+  const montoNeto = useMemo(() => {
+    return monto - comision - retencion;
+  }, [monto, comision, retencion]);
+
+  function handleSubmit(event: FormEvent) {
+    event.preventDefault();
+
+    if (!cliente.trim() || !concepto.trim()) {
+      alert("Completá cliente y concepto.");
+      return;
+    }
+
+    onSubmit({
+      cliente,
+      concepto,
+      monto,
+      metodoCobro,
+      comision,
+      retencion,
+      estado,
+      facturaEmitida,
+    });
+
+    setCliente("");
+    setConcepto("");
+    setMonto(0);
+    setMetodoCobro("TRANSFERENCIA");
+    setComision(0);
+    setRetencion(0);
+    setEstado("COBRADO");
+    setFacturaEmitida(true);
+  }
+
+  return (
+    <form className="card form-grid" onSubmit={handleSubmit}>
+      <div className="form-field">
+        <label>Cliente</label>
+
+        <input
+          value={cliente}
+          onChange={(e) => setCliente(e.target.value)}
+          placeholder="Ej: Empresa ABC"
+        />
+      </div>
+
+      <div className="form-field">
+        <label>Concepto</label>
+
+        <input
+          value={concepto}
+          onChange={(e) => setConcepto(e.target.value)}
+          placeholder="Ej: Servicio de transporte"
+        />
+      </div>
+
+      <div className="form-field">
+        <label>Monto bruto</label>
+
+        <input
+          type="number"
+          value={monto}
+          onChange={(e) => setMonto(Number(e.target.value))}
+        />
+      </div>
+
+      <div className="form-field">
+        <label>Método de cobro</label>
+
+        <select
+          value={metodoCobro}
+          onChange={(e) =>
+            setMetodoCobro(e.target.value as MetodoCobro)
+          }
+        >
+          {metodos.map((metodo) => (
+            <option key={metodo} value={metodo}>
+              {metodo}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div className="form-field">
+        <label>Comisión</label>
+
+        <input
+          type="number"
+          value={comision}
+          onChange={(e) =>
+            setComision(Number(e.target.value))
+          }
+        />
+      </div>
+
+      <div className="form-field">
+        <label>Retención</label>
+
+        <input
+          type="number"
+          value={retencion}
+          onChange={(e) =>
+            setRetencion(Number(e.target.value))
+          }
+        />
+      </div>
+
+      <div className="form-field">
+        <label>Estado</label>
+
+        <select
+          value={estado}
+          onChange={(e) =>
+            setEstado(e.target.value as EstadoCobro)
+          }
+        >
+          {estados.map((estadoItem) => (
+            <option key={estadoItem} value={estadoItem}>
+              {estadoItem}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div className="form-field">
+        <label>Emitir factura simulada</label>
+
+        <select
+          value={String(facturaEmitida)}
+          onChange={(e) =>
+            setFacturaEmitida(e.target.value === "true")
+          }
+        >
+          <option value="true">Sí</option>
+          <option value="false">No</option>
+        </select>
+      </div>
+
+      <article className="card">
+        <div className="card-label">Monto neto</div>
+
+        <div className="card-value">
+          ${montoNeto.toLocaleString("es-AR")}
+        </div>
+
+        <div className="card-note">
+          Bruto menos comisiones y retenciones
+        </div>
+      </article>
+
+      <button className="primary-button" type="submit">
+        Registrar ingreso
+      </button>
+    </form>
+  );
+}

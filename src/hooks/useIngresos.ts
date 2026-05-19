@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 import type { EstadoCobro, Ingreso, MetodoCobro } from "../domain/ingreso";
 import { getConfiguracion } from "../services/configuracionService";
+import { updateEstadoEnvio } from "../services/enviosService";
 import { emitirFacturaSimulada } from "../services/facturacionService";
 import {
   deleteIngreso,
   getIngresos,
   saveIngreso,
 } from "../services/ingresosService";
-import { updateEstadoEnvio } from "../services/enviosService";
 import { getToday } from "../utils/dates";
 
 type NuevoIngresoInput = {
@@ -72,7 +72,14 @@ export function useIngresos() {
   }
 
   function eliminarIngreso(id: string) {
+    const ingresoAEliminar = ingresos.find((ingreso) => ingreso.id === id);
+
     const actualizados = deleteIngreso(id);
+
+    if (ingresoAEliminar?.envioId) {
+      updateEstadoEnvio(ingresoAEliminar.envioId, "ENTREGADO");
+    }
+
     setIngresos(actualizados);
   }
 

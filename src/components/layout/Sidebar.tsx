@@ -33,6 +33,10 @@ export default function Sidebar() {
           Ingresos
         </NavLink>
 
+        <NavLink to="/facturas" className="nav-link">
+          Facturas
+        </NavLink>
+
         <NavLink to="/reportes" className="nav-link">
           Reportes
         </NavLink>

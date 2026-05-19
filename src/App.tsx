@@ -8,6 +8,7 @@ import Clientes from "./pages/Clientes";
 import Vehiculo from "./pages/Vehiculo";
 import Ayudantes from "./pages/Ayudantes";
 import IngresosFacturacion from "./pages/IngresosFacturacion";
+import Facturas from "./pages/Facturas";
 import Reportes from "./pages/Reportes";
 import Configuracion from "./pages/Configuracion";
 
@@ -22,6 +23,7 @@ export default function App() {
         <Route path="/vehiculo" element={<Vehiculo />} />
         <Route path="/ayudantes" element={<Ayudantes />} />
         <Route path="/ingresos" element={<IngresosFacturacion />} />
+        <Route path="/facturas" element={<Facturas />} />
         <Route path="/reportes" element={<Reportes />} />
         <Route path="/configuracion" element={<Configuracion />} />
       </Routes>

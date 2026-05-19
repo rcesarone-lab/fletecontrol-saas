@@ -1,8 +1,11 @@
-export const seedConfiguracion = {
+import type { ConfiguracionSistema } from "../domain/configuracion";
+
+export const seedConfiguracion: ConfiguracionSistema = {
   empresa: "FleteControl-SaaS",
 
   monotributista: {
     nombre: "Transportista Demo",
+    cuit: "",
     categoria: "C",
     puntoVenta: 1,
   },

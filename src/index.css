@@ -623,3 +623,115 @@ th {
   }
 }
 
+@media (max-width: 760px) {
+  .form-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .form-field {
+    width: 100%;
+  }
+
+  .form-field.full {
+    grid-column: auto;
+  }
+
+  .form-field label {
+    font-size: 13px;
+    margin-bottom: 6px;
+  }
+
+  .form-field input,
+  .form-field textarea,
+  .form-field select,
+  select,
+  textarea,
+  input {
+    width: 100%;
+    font-size: 16px;
+    border-radius: 14px;
+    padding: 12px 14px;
+    box-sizing: border-box;
+  }
+
+  textarea {
+    min-height: 90px;
+    resize: vertical;
+  }
+
+  .primary-button,
+  .secondary-button,
+  .danger-button {
+    position: relative;
+    min-height: 48px;
+    border-radius: 14px;
+    font-size: 15px;
+    font-weight: 600;
+  }
+
+  .table-card h2,
+  .card h2 {
+    font-size: 18px;
+  }
+
+  .card-label {
+    font-size: 12px;
+  }
+
+  .card-note {
+    font-size: 12px;
+    line-height: 1.4;
+  }
+
+  .tarifa-box {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .metric-row strong {
+    font-size: 15px;
+  }
+
+  .page-description {
+    margin-bottom: 14px;
+  }
+
+  .content section {
+    margin-bottom: 14px;
+  }
+}
+
+@media (max-width: 760px) {
+  .form-grid .primary-button {
+    position: sticky;
+    bottom: 12px;
+    z-index: 20;
+    box-shadow: 0 14px 35px rgba(37, 99, 235, 0.35);
+  }
+
+  .form-grid .card {
+    margin-top: 4px;
+  }
+
+  .form-field input[type="number"] {
+    appearance: textfield;
+  }
+
+  .form-field input[type="number"]::-webkit-outer-spin-button,
+  .form-field input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  .form-field select {
+    min-height: 48px;
+  }
+
+  .form-field textarea {
+    min-height: 96px;
+  }
+}
+

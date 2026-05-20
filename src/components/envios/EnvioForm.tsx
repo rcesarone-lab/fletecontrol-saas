@@ -12,7 +12,7 @@ type EnvioFormProps = {
     direccionDestino: string;
     localidad: string;
     provincia: string;
-    tarifaGremial: number;
+    tarifaReferenciaMercado: number;
     tarifaContratante: number;
     costoEstimado: number;
     observaciones?: string;
@@ -39,14 +39,14 @@ export default function EnvioForm({
   const [direccionDestino, setDireccionDestino] = useState("");
   const [localidad, setLocalidad] = useState("");
   const [provincia, setProvincia] = useState("Buenos Aires");
-  const [tarifaGremial, setTarifaGremial] =
+  const [tarifaReferenciaMercado, setTarifaReferenciaMercado] =
     useState(tarifaMinimaGremialBase);
   const [tarifaContratante, setTarifaContratante] = useState(0);
   const [costoEstimado, setCostoEstimado] = useState(0);
   const [observaciones, setObservaciones] = useState("");
 
   useEffect(() => {
-    setTarifaGremial(tarifaMinimaGremialBase);
+    setTarifaReferenciaMercado(tarifaMinimaGremialBase);
   }, [tarifaMinimaGremialBase]);
 
   function handleSubmit(event: FormEvent) {
@@ -76,8 +76,8 @@ export default function EnvioForm({
       return;
     }
 
-    if (tarifaGremial < 0 || costoEstimado < 0) {
-      onError("La tarifa gremial y el costo estimado no pueden ser negativos.");
+    if (tarifaReferenciaMercado < 0 || costoEstimado < 0) {
+      onError("La tarifa de referencia de mercado y el costo estimado no pueden ser negativos.");
       return;
     }
 
@@ -88,7 +88,7 @@ export default function EnvioForm({
       direccionDestino,
       localidad,
       provincia,
-      tarifaGremial,
+      tarifaReferenciaMercado,
       tarifaContratante,
       costoEstimado,
       observaciones,
@@ -101,7 +101,7 @@ export default function EnvioForm({
     setDireccionDestino("");
     setLocalidad("");
     setProvincia("Buenos Aires");
-    setTarifaGremial(tarifaMinimaGremialBase);
+    setTarifaReferenciaMercado(tarifaMinimaGremialBase);
     setTarifaContratante(0);
     setCostoEstimado(0);
     setObservaciones("");
@@ -166,13 +166,13 @@ export default function EnvioForm({
       </div>
 
       <div className="form-field">
-        <label>Tarifa gremial</label>
+        <label>Tarifa de referencia de mercado</label>
 
         <input
           type="number"
-          value={tarifaGremial}
+          value={tarifaReferenciaMercado}
           onChange={(e) =>
-            setTarifaGremial(Number(e.target.value))
+            setTarifaReferenciaMercado(Number(e.target.value))
           }
         />
       </div>

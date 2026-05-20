@@ -10,7 +10,7 @@ export const seedEnvios: Envio[] = [
     localidad: 'Localidad A',
     provincia: 'Buenos Aires',
     fecha: new Date().toISOString(),
-    tarifaGremial: 120,
+    tarifaReferenciaMercado: 120,
     tarifaContratante: 150,
     costoEstimado: 270,
     estado: 'PENDIENTE',

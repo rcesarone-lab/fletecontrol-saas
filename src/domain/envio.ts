@@ -24,7 +24,7 @@ export type Envio = {
 
   estado: EstadoEnvio;
 
-  tarifaGremial: number;
+  tarifaReferenciaMercado: number;
 
   tarifaContratante: number;
 

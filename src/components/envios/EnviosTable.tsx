@@ -85,7 +85,7 @@ export default function EnviosTable({
 
                 <td>
                   <ComparativoTarifa
-                    tarifaGremial={envio.tarifaGremial}
+                    tarifaReferenciaMercado={envio.tarifaReferenciaMercado}
                     tarifaContratante={envio.tarifaContratante}
                     costoEstimado={envio.costoEstimado}
                   />

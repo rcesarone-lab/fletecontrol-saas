@@ -115,3 +115,48 @@ export function getResumenFinanciero() {
     totalFacturas: facturas.length,
   };
 }
+
+export function getReporteClientes() {
+  const envios = getEnvios();
+  const ingresos = getIngresos();
+  const clientes = getClientes();
+
+  return clientes.map((cliente) => {
+    const enviosCliente = envios.filter(
+      (envio) => envio.clienteId === cliente.id
+    );
+
+    const ingresosCliente = ingresos.filter(
+      (ingreso) => ingreso.clienteId === cliente.id
+    );
+
+    const totalFacturado = ingresosCliente.reduce(
+      (total, ingreso) => total + ingreso.monto,
+      0
+    );
+
+    const totalNeto = ingresosCliente.reduce(
+      (total, ingreso) => total + ingreso.montoNeto,
+      0
+    );
+
+    const costosEstimados = enviosCliente.reduce(
+      (total, envio) => total + envio.costoEstimado,
+      0
+    );
+
+    const margenEstimado = totalNeto - costosEstimados;
+
+    return {
+      clienteId: cliente.id,
+      razonSocial: cliente.razonSocial,
+      cuit: cliente.cuit,
+      cantidadEnvios: enviosCliente.length,
+      ingresosRegistrados: ingresosCliente.length,
+      totalFacturado,
+      totalNeto,
+      costosEstimados,
+      margenEstimado,
+    };
+  });
+}

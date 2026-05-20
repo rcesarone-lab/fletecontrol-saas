@@ -1,18 +1,18 @@
 type ComparativoTarifaProps = {
-  tarifaGremial: number;
+  tarifaReferenciaMercado: number;
   tarifaContratante: number;
   costoEstimado: number;
 };
 
 export default function ComparativoTarifa({
-  tarifaGremial,
+  tarifaReferenciaMercado,
   tarifaContratante,
   costoEstimado,
 }: ComparativoTarifaProps) {
-  const tieneReferencia = tarifaGremial > 0;
+  const tieneReferencia = tarifaReferenciaMercado > 0;
 
   const diferenciaMercado =
-    tarifaContratante - tarifaGremial;
+    tarifaContratante - tarifaReferenciaMercado;
 
   const rentabilidad = tarifaContratante - costoEstimado;
 
@@ -23,13 +23,9 @@ export default function ComparativoTarifa({
   return (
     <div className="tarifa-box">
       <div>
-        <span className="card-label">
-          Diferencia vs mercado
-        </span>
+        <span className="card-label">Diferencia vs mercado</span>
 
-        <strong
-          className={tarifaBaja ? "text-danger" : "text-success"}
-        >
+        <strong className={tarifaBaja ? "text-danger" : "text-success"}>
           {tieneReferencia
             ? `$${diferenciaMercado.toLocaleString("es-AR")}`
             : "Sin referencia"}
@@ -37,16 +33,10 @@ export default function ComparativoTarifa({
       </div>
 
       <div>
-        <span className="card-label">
-          Rentabilidad estimada
-        </span>
+        <span className="card-label">Rentabilidad estimada</span>
 
         <strong
-          className={
-            rentabilidadNegativa
-              ? "text-danger"
-              : "text-success"
-          }
+          className={rentabilidadNegativa ? "text-danger" : "text-success"}
         >
           ${rentabilidad.toLocaleString("es-AR")}
         </strong>

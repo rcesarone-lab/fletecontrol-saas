@@ -15,7 +15,7 @@ type NuevoEnvioInput = {
   direccionDestino: string;
   localidad: string;
   provincia: string;
-  tarifaGremial: number;
+  tarifaReferenciaMercado: number;
   tarifaContratante: number;
   costoEstimado: number;
   observaciones?: string;

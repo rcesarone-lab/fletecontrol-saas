@@ -1,55 +1,67 @@
 import { NavLink } from "react-router-dom";
 
-export default function Sidebar() {
+type SidebarProps = {
+  open: boolean;
+  onClose: () => void;
+};
+
+export default function Sidebar({ open, onClose }: SidebarProps) {
   return (
-    <aside className="sidebar">
-      <div className="brand">
-        <div className="brand-title">FleteControl-SaaS</div>
-        <div className="brand-subtitle">Gestión de fletes y encomiendas</div>
-      </div>
+    <>
+      <div
+        className={`sidebar-overlay ${open ? "visible" : ""}`}
+        onClick={onClose}
+      />
 
-      <nav className="nav">
-        <NavLink to="/dashboard" className="nav-link">
-          Dashboard
-        </NavLink>
+      <aside className={`sidebar ${open ? "sidebar-open" : ""}`}>
+        <div className="brand">
+          <div className="brand-title">FleteControl-SaaS</div>
+          <div className="brand-subtitle">Gestión de fletes y encomiendas</div>
+        </div>
 
-        <NavLink to="/envios" className="nav-link">
-          Envíos
-        </NavLink>
+        <nav className="nav">
+          <NavLink to="/dashboard" className="nav-link" onClick={onClose}>
+            Dashboard
+          </NavLink>
 
-        <NavLink to="/clientes" className="nav-link">
-          Clientes
-        </NavLink>
+          <NavLink to="/envios" className="nav-link" onClick={onClose}>
+            Envíos
+          </NavLink>
 
-        <NavLink to="/vehiculo" className="nav-link">
-          Vehículo
-        </NavLink>
+          <NavLink to="/clientes" className="nav-link" onClick={onClose}>
+            Clientes
+          </NavLink>
 
-        <NavLink to="/ayudantes" className="nav-link">
-          Ayudantes
-        </NavLink>
+          <NavLink to="/vehiculo" className="nav-link" onClick={onClose}>
+            Vehículo
+          </NavLink>
 
-        <NavLink to="/ingresos" className="nav-link">
-          Ingresos
-        </NavLink>
+          <NavLink to="/ayudantes" className="nav-link" onClick={onClose}>
+            Ayudantes
+          </NavLink>
 
-        <NavLink to="/facturas" className="nav-link">
-          Facturas
-        </NavLink>
+          <NavLink to="/ingresos" className="nav-link" onClick={onClose}>
+            Ingresos
+          </NavLink>
 
-        <NavLink to="/reportes" className="nav-link">
-          Reportes
-        </NavLink>
+          <NavLink to="/facturas" className="nav-link" onClick={onClose}>
+            Facturas
+          </NavLink>
 
-        <NavLink to="/configuracion" className="nav-link">
-          Configuración
-        </NavLink>
-      </nav>
+          <NavLink to="/reportes" className="nav-link" onClick={onClose}>
+            Reportes
+          </NavLink>
 
-      <div className="signature">
-        <div className="signature-name">CRamirez</div>
-        <div className="signature-role">Consultor de Sistemas</div>
-      </div>
-    </aside>
+          <NavLink to="/configuracion" className="nav-link" onClick={onClose}>
+            Configuración
+          </NavLink>
+        </nav>
+
+        <div className="signature">
+          <div className="signature-name">CRamirez</div>
+          <div className="signature-role">Consultor de Sistemas</div>
+        </div>
+      </aside>
+    </>
   );
 }

@@ -28,8 +28,8 @@ export default function ConfiguracionForm({
   );
   const [patente, setPatente] = useState(configuracion.vehiculo.patente);
   const [modelo, setModelo] = useState(configuracion.vehiculo.modelo);
-  const [tarifaMinimaGremial, setTarifaMinimaGremial] = useState(
-    configuracion.tarifas.tarifaMinimaGremial
+  const [tarifaReferenciaMercadoDefault, settarifaReferenciaMercadoDefault] = useState(
+    configuracion.tarifas.tarifaReferenciaMercadoDefault
   );
 
   function handleSubmit(event: FormEvent) {
@@ -55,8 +55,8 @@ export default function ConfiguracionForm({
       return;
     }
 
-    if (tarifaMinimaGremial <= 0) {
-      onError("La tarifa mínima gremial debe ser mayor a cero.");
+    if (tarifaReferenciaMercadoDefault < 0) {
+      onError("La tarifa referencia mercado debe ser mayor o igual a cero.");
       return;
     }
 
@@ -76,7 +76,7 @@ export default function ConfiguracionForm({
         modelo,
       },
       tarifas: {
-        tarifaMinimaGremial,
+        tarifaReferenciaMercadoDefault,
       },
     });
 
@@ -145,8 +145,8 @@ export default function ConfiguracionForm({
         <label>Tarifa referencia mercado</label>
         <input
           type="number"
-          value={tarifaMinimaGremial}
-          onChange={(e) => setTarifaMinimaGremial(Number(e.target.value))}
+          value={tarifaReferenciaMercadoDefault}
+          onChange={(e) => settarifaReferenciaMercadoDefault(Number(e.target.value))}
         />
       </div>
 

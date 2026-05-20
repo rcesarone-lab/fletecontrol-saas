@@ -32,7 +32,7 @@ export default function EnvioForm({
   const { configuracion } = useConfiguracion();
 
   const tarifaMinimaGremialBase =
-    configuracion?.tarifas.tarifaMinimaGremial ?? 0;
+    configuracion?.tarifas.tarifaReferenciaMercadoDefault ?? 0;
 
   const [clienteId, setClienteId] = useState("");
   const [materiales, setMateriales] = useState("");

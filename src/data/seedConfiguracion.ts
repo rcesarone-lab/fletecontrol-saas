@@ -20,6 +20,6 @@ export const seedConfiguracion: ConfiguracionSistema = {
   },
 
   tarifas: {
-    tarifaMinimaGremial: 0,
+    tarifaReferenciaMercadoDefault: 0,
   },
 };

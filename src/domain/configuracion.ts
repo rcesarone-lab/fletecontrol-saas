@@ -18,6 +18,6 @@ export type ConfiguracionSistema = {
   };
 
   tarifas: {
-    tarifaMinimaGremial: number;
+    tarifaReferenciaMercadoDefault: number;
   };
 };

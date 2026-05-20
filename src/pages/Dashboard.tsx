@@ -1,6 +1,7 @@
 import KpiCard from "../components/dashboard/KpiCard";
 import { useDashboard } from "../hooks/useDashboard";
 import { formatCurrency } from "../utils/currency";
+import DashboardCharts from "../components/dashboard/DashboardCharts";
 
 export default function Dashboard() {
   const { resumen } = useDashboard();
@@ -160,6 +161,9 @@ export default function Dashboard() {
           </p>
         </article>
       </section>
+
+      <DashboardCharts />
+
     </>
   );
 }

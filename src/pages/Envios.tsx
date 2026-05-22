@@ -18,6 +18,7 @@ export default function Envios() {
     agregarEnvio,
     cambiarEstado,
     eliminarEnvio,
+    refrescarEnvios,
   } = useEnvios();
 
   const {
@@ -33,14 +34,19 @@ export default function Envios() {
   function confirmarEliminacion() {
     if (!envioAEliminar) return;
 
-    eliminarEnvio(envioAEliminar);
-
-    setEnvioAEliminar(null);
-
-    showToast(
-      "Envío eliminado correctamente.",
-      "success"
-    );
+    try {
+      eliminarEnvio(envioAEliminar);
+      showToast("Envío eliminado correctamente.", "success");
+    } catch (error) {
+      showToast(
+        error instanceof Error
+          ? error.message
+          : "No se pudo eliminar el envío.",
+        "error"
+      );
+    } finally {
+      setEnvioAEliminar(null);
+    }
   }
 
   function cancelarEliminacion() {
@@ -151,7 +157,20 @@ export default function Envios() {
       <div style={{ marginTop: 18 }}>
         <EnviosTable
           envios={envios}
-          onChangeEstado={cambiarEstado}
+          onChangeEstado={(id, estado) => {
+            try {
+              cambiarEstado(id, estado);
+              showToast("Estado actualizado correctamente.", "success");
+            } catch (error) {
+              showToast(
+                error instanceof Error
+                  ? error.message
+                  : "No se pudo actualizar el estado.",
+                "error"
+              );
+              refrescarEnvios();
+            }
+          }}
           onDelete={(id) =>
             setEnvioAEliminar(id)
           }

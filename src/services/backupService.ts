@@ -1,4 +1,5 @@
 import { STORAGE_KEYS } from "./storage";
+import { registrarEventoAuditoria } from "./auditoriaService";
 
 export type BackupFleteControl = {
   version: string;
@@ -38,6 +39,12 @@ export function descargarBackup() {
 
   link.click();
 
+  registrarEventoAuditoria({
+    tipo: "BACKUP_EXPORTADO",
+    descripcion: "Backup exportado correctamente",
+    entidad: "BACKUP",
+  });
+
   URL.revokeObjectURL(url);
 }
 
@@ -60,6 +67,12 @@ export function importarBackup(file: File): Promise<void> {
           } else {
             localStorage.setItem(key, JSON.stringify(value));
           }
+        });
+
+        registrarEventoAuditoria({
+          tipo: "BACKUP_IMPORTADO",
+          descripcion: "Backup importado correctamente",
+          entidad: "BACKUP",
         });
 
         resolve();

@@ -4,34 +4,28 @@
   | "MERCADOPAGO"
   | "CHEQUE";
 
-export type EstadoCobro =
-  | "PENDIENTE"
-  | "COBRADO";
+export type EstadoCobro = "PENDIENTE" | "COBRADO";
 
 export type Ingreso = {
   id: string;
-
   fecha: string;
 
-  clienteId?: string;
+  facturaId?: string;
 
+  clienteId?: string;
   cliente: string;
 
-  envioId?: string;
-
   concepto: string;
-
   monto: number;
 
   metodoCobro: MetodoCobro;
+  referenciaOperacion?: string;
 
   comision: number;
-
   retencion: number;
-
   montoNeto: number;
 
   estado: EstadoCobro;
 
-  facturaEmitida: boolean;
+  observaciones?: string;
 };

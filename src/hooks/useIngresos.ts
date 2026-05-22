@@ -1,8 +1,5 @@
 import { useEffect, useState } from "react";
 import type { EstadoCobro, Ingreso, MetodoCobro } from "../domain/ingreso";
-import { getConfiguracion } from "../services/configuracionService";
-import { updateEstadoEnvio } from "../services/enviosService";
-import { emitirFacturaSimulada } from "../services/facturacionService";
 import {
   deleteIngreso,
   getIngresos,
@@ -11,18 +8,17 @@ import {
 import { getToday } from "../utils/dates";
 
 type NuevoIngresoInput = {
+  facturaId?: string;
   clienteId?: string;
   cliente: string;
-  clienteCuit?: string;
-  clienteDireccion?: string;
-  envioId?: string;
   concepto: string;
   monto: number;
   metodoCobro: MetodoCobro;
+  referenciaOperacion?: string;
   comision: number;
   retencion: number;
   estado: EstadoCobro;
-  facturaEmitida: boolean;
+  observaciones?: string;
 };
 
 export function useIngresos() {
@@ -38,54 +34,37 @@ export function useIngresos() {
     const nuevoIngreso: Ingreso = {
       id: crypto.randomUUID(),
       fecha: getToday(),
+      facturaId: input.facturaId,
       clienteId: input.clienteId,
       cliente: input.cliente,
-      envioId: input.envioId,
       concepto: input.concepto,
       monto: input.monto,
       metodoCobro: input.metodoCobro,
+      referenciaOperacion: input.referenciaOperacion,
       comision: input.comision,
       retencion: input.retencion,
       montoNeto,
       estado: input.estado,
-      facturaEmitida: input.facturaEmitida,
+      observaciones: input.observaciones,
     };
 
     const actualizados = saveIngreso(nuevoIngreso);
-
-    if (input.facturaEmitida) {
-      emitirFacturaSimulada({
-        clienteId: input.clienteId,
-        cliente: input.cliente,
-        clienteCuit: input.clienteCuit,
-        clienteDireccion: input.clienteDireccion,
-        importeTotal: input.monto,
-        configuracion: getConfiguracion(),
-      });
-    }
-
-    if (input.envioId && input.estado === "COBRADO") {
-      updateEstadoEnvio(input.envioId, "COBRADO");
-    }
-
     setIngresos(actualizados);
   }
 
   function eliminarIngreso(id: string) {
-    const ingresoAEliminar = ingresos.find((ingreso) => ingreso.id === id);
-
     const actualizados = deleteIngreso(id);
-
-    if (ingresoAEliminar?.envioId) {
-      updateEstadoEnvio(ingresoAEliminar.envioId, "ENTREGADO");
-    }
-
     setIngresos(actualizados);
+  }
+
+  function refrescarIngresos() {
+    setIngresos(getIngresos());
   }
 
   return {
     ingresos,
     agregarIngreso,
     eliminarIngreso,
+    refrescarIngresos,
   };
 }

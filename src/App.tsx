@@ -3,8 +3,9 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import PageLayout from "./components/layout/PageLayout";
 
 import Dashboard from "./pages/Dashboard";
-import Envios from "./pages/Envios";
 import Clientes from "./pages/Clientes";
+import Envios from "./pages/Envios";
+import Facturacion from "./pages/Facturacion";
 import Vehiculo from "./pages/Vehiculo";
 import Ayudantes from "./pages/Ayudantes";
 import IngresosFacturacion from "./pages/IngresosFacturacion";
@@ -18,8 +19,9 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
         <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/envios" element={<Envios />} />
         <Route path="/clientes" element={<Clientes />} />
+        <Route path="/envios" element={<Envios />} />
+        <Route path="/facturacion" element={<Facturacion />} />
         <Route path="/vehiculo" element={<Vehiculo />} />
         <Route path="/ayudantes" element={<Ayudantes />} />
         <Route path="/ingresos" element={<IngresosFacturacion />} />

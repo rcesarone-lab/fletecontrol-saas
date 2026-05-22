@@ -61,7 +61,7 @@ export default function IngresoForm({
   const enviosCliente = envios.filter(
     (envio) =>
       envio.clienteId === clienteId &&
-      envio.estado !== "CANCELADO"
+      envio.estado === "ENTREGADO"
   );
 
   const envioSeleccionado = envios.find(

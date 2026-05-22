@@ -50,10 +50,15 @@ export function useEnvios() {
     setEnvios(actualizados);
   }
 
+  function refrescarEnvios() {
+    setEnvios(getEnvios());
+  }
+
   return {
     envios,
     agregarEnvio,
     cambiarEstado,
     eliminarEnvio,
+    refrescarEnvios,
   };
 }

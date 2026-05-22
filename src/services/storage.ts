@@ -12,6 +12,8 @@ export const STORAGE_KEYS = {
   INGRESOS: "FC_INGRESOS",
 
   CONFIGURACION: "FC_CONFIGURACION",
+
+  AUDITORIA: "FC_AUDITORIA",
 };
 
 export function saveData<T>(key: string, data: T) {

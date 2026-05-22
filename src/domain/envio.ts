@@ -2,32 +2,26 @@ export type EstadoEnvio =
   | "PENDIENTE"
   | "EN_TRANSITO"
   | "ENTREGADO"
+  | "FACTURADO"
   | "COBRADO"
   | "CANCELADO";
 
 export type Envio = {
   id: string;
-
   fecha: string;
 
   clienteId: string;
-
   empresaCliente: string;
 
   materiales: string;
-
   direccionDestino: string;
-
   localidad: string;
-
   provincia: string;
 
   estado: EstadoEnvio;
 
   tarifaReferenciaMercado: number;
-
   tarifaContratante: number;
-
   costoEstimado: number;
 
   observaciones?: string;

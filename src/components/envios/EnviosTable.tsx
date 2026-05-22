@@ -11,7 +11,6 @@ const estados: EstadoEnvio[] = [
   "PENDIENTE",
   "EN_TRANSITO",
   "ENTREGADO",
-  "COBRADO",
   "CANCELADO",
 ];
 

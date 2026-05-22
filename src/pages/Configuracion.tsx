@@ -3,6 +3,7 @@ import ConfiguracionForm from "../components/configuracion/ConfiguracionForm";
 import Toast from "../components/ui/Toast";
 import { useConfiguracion } from "../hooks/useConfiguracion";
 import { useToast } from "../hooks/useToast";
+import AuditoriaPanel from "../components/configuracion/AuditoriaPanel";
 
 export default function Configuracion() {
   const { configuracion, actualizarConfiguracion } = useConfiguracion();
@@ -70,6 +71,10 @@ export default function Configuracion() {
 
       <div style={{ marginTop: 18 }}>
         <BackupPanel />
+      </div>
+
+      <div style={{ marginTop: 18 }}>
+        <AuditoriaPanel />
       </div>
 
       <Toast message={message} type={type} onClose={clearToast} />

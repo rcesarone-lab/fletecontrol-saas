@@ -24,12 +24,20 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
             Dashboard
           </NavLink>
 
+          <NavLink to="/clientes" className="nav-link" onClick={onClose}>
+            Clientes
+          </NavLink>
+
           <NavLink to="/envios" className="nav-link" onClick={onClose}>
             Envíos
           </NavLink>
 
-          <NavLink to="/clientes" className="nav-link" onClick={onClose}>
-            Clientes
+          <NavLink to="/facturacion" className="nav-link" onClick={onClose}>
+            Facturación
+          </NavLink>
+
+          <NavLink to="/Cobros" className="nav-link" onClick={onClose}>
+            Cobros
           </NavLink>
 
           <NavLink to="/vehiculo" className="nav-link" onClick={onClose}>
@@ -38,10 +46,6 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
 
           <NavLink to="/ayudantes" className="nav-link" onClick={onClose}>
             Ayudantes
-          </NavLink>
-
-          <NavLink to="/ingresos" className="nav-link" onClick={onClose}>
-            Ingresos
           </NavLink>
 
           <NavLink to="/facturas" className="nav-link" onClick={onClose}>

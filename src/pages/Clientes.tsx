@@ -15,9 +15,19 @@ export default function Clientes() {
   function confirmarEliminacion() {
     if (!clienteAEliminar) return;
 
-    eliminarCliente(clienteAEliminar);
-    setClienteAEliminar(null);
-    showToast("Cliente eliminado correctamente.", "success");
+    try {
+      eliminarCliente(clienteAEliminar);
+      showToast("Cliente eliminado correctamente.", "success");
+    } catch (error) {
+      showToast(
+        error instanceof Error
+          ? error.message
+          : "No se pudo eliminar el cliente.",
+        "error"
+      );
+    } finally {
+      setClienteAEliminar(null);
+    }
   }
 
   function cancelarEliminacion() {

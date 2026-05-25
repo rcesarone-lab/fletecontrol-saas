@@ -156,3 +156,48 @@ export function deleteEnvio(id: string): Envio[] {
 
   return filtrados;
 }
+
+export function updateEnvio(envioActualizado: Envio): Envio[] {
+  const envios = getEnvios();
+
+  const envioExistente = envios.find(
+    (envio) => envio.id === envioActualizado.id
+  );
+
+  if (!envioExistente) {
+    throw new Error("No se encontró el envío.");
+  }
+
+  if (
+    envioExistente.estado === "ENTREGADO" ||
+    envioExistente.estado === "FACTURADO" ||
+    envioExistente.estado === "COBRADO"
+  ) {
+    registrarEventoAuditoria({
+      tipo: "ENVIO_ESTADO_BLOQUEADO",
+      descripcion:
+        "No se puede editar un envío entregado, facturado o cobrado.",
+      entidad: "ENVIO",
+      entidadId: envioActualizado.id,
+    });
+
+    throw new Error(
+      "No se puede editar un envío entregado, facturado o cobrado."
+    );
+  }
+
+  const actualizados = envios.map((envio) =>
+    envio.id === envioActualizado.id ? envioActualizado : envio
+  );
+
+  saveData(STORAGE_KEYS.ENVIOS, actualizados);
+
+  registrarEventoAuditoria({
+    tipo: "ENVIO_ESTADO_CAMBIADO",
+    descripcion: `Envío actualizado: ${envioActualizado.empresaCliente}`,
+    entidad: "ENVIO",
+    entidadId: envioActualizado.id,
+  });
+
+  return actualizados;
+}

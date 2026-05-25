@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 import AyudanteForm from "../components/ayudantes/AyudanteForm";
 import PagosAyudanteTable from "../components/ayudantes/PagosAyudanteTable";
@@ -6,17 +6,21 @@ import PagosAyudanteTable from "../components/ayudantes/PagosAyudanteTable";
 import ConfirmModal from "../components/ui/ConfirmModal";
 import Toast from "../components/ui/Toast";
 
+import type { PagoAyudante } from "../domain/ayudante";
 import { useAyudantes } from "../hooks/useAyudantes";
 import { useToast } from "../hooks/useToast";
 
 import { formatCurrency } from "../utils/currency";
 
 export default function Ayudantes() {
-  const { pagos, agregarPago, eliminarPago } = useAyudantes();
+  const { pagos, agregarPago, actualizarPago, eliminarPago } = useAyudantes();
 
   const { message, type, showToast, clearToast } = useToast();
 
   const [pagoAEliminar, setPagoAEliminar] = useState<string | null>(null);
+  const [pagoEditando, setPagoEditando] = useState<PagoAyudante | null>(null);
+
+  const formRef = useRef<HTMLDivElement | null>(null);
 
   const totalPagado = pagos.reduce((total, pago) => total + pago.monto, 0);
 
@@ -32,6 +36,45 @@ export default function Ayudantes() {
   const ayudantesUnicos = new Set(
     pagos.map((pago) => pago.ayudanteNombre.trim().toLowerCase())
   ).size;
+
+  function guardarPago(data: {
+    ayudanteNombre: string;
+    horasTrabajadas: number;
+    valorHora: number;
+    metodoPago: PagoAyudante["metodoPago"];
+    comprobanteUrl?: string;
+  }) {
+    if (pagoEditando) {
+      actualizarPago({
+        ...pagoEditando,
+        ...data,
+      });
+
+      setPagoEditando(null);
+      return;
+    }
+
+    agregarPago(data);
+  }
+
+  function editarPago(pago: PagoAyudante) {
+    setPagoEditando(pago);
+
+    setTimeout(() => {
+      formRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }, 0);
+
+    setTimeout(() => {
+      const firstInput = formRef.current?.querySelector(
+        "input, select, textarea"
+      ) as HTMLElement | null;
+
+      firstInput?.focus({ preventScroll: true });
+    }, 350);
+  }
 
   function confirmarEliminacion() {
     if (!pagoAEliminar) return;
@@ -79,9 +122,11 @@ export default function Ayudantes() {
         </article>
       </section>
 
-      <div style={{ marginTop: 18 }}>
+      <div ref={formRef} style={{ marginTop: 18 }}>
         <AyudanteForm
-          onSubmit={agregarPago}
+          pagoEditando={pagoEditando}
+          onSubmit={guardarPago}
+          onCancelEdit={() => setPagoEditando(null)}
           onError={(msg) => showToast(msg, "error")}
           onSuccess={(msg) => showToast(msg, "success")}
         />
@@ -90,6 +135,7 @@ export default function Ayudantes() {
       <div style={{ marginTop: 18 }}>
         <PagosAyudanteTable
           pagos={pagos}
+          onEdit={editarPago}
           onDelete={(id) => setPagoAEliminar(id)}
         />
       </div>

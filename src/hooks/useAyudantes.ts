@@ -4,6 +4,7 @@ import {
   deletePagoAyudante,
   getPagosAyudantes,
   savePagoAyudante,
+  updatePagoAyudante,
 } from "../services/ayudantesService";
 import { getToday } from "../utils/dates";
 
@@ -13,6 +14,7 @@ type NuevoPagoAyudanteInput = {
   valorHora: number;
   metodoPago: MetodoPago;
   comprobanteUrl?: string;
+  fecha?: string;
 };
 
 export function useAyudantes() {
@@ -25,12 +27,22 @@ export function useAyudantes() {
   function agregarPago(input: NuevoPagoAyudanteInput) {
     const nuevoPago: PagoAyudante = {
       id: crypto.randomUUID(),
-      fecha: getToday(),
+      fecha: input.fecha || getToday(),
       monto: input.horasTrabajadas * input.valorHora,
       ...input,
     };
 
     const actualizados = savePagoAyudante(nuevoPago);
+    setPagos(actualizados);
+  }
+
+  function actualizarPago(pago: PagoAyudante) {
+    const actualizado: PagoAyudante = {
+      ...pago,
+      monto: pago.horasTrabajadas * pago.valorHora,
+    };
+
+    const actualizados = updatePagoAyudante(actualizado);
     setPagos(actualizados);
   }
 
@@ -42,6 +54,7 @@ export function useAyudantes() {
   return {
     pagos,
     agregarPago,
+    actualizarPago,
     eliminarPago,
   };
 }

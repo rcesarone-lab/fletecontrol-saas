@@ -58,3 +58,22 @@ export function deleteCliente(id: string): Cliente[] {
 
   return actualizados;
 }
+
+export function updateCliente(clienteActualizado: Cliente): Cliente[] {
+  const clientes = getClientes();
+
+  const actualizados = clientes.map((cliente) =>
+    cliente.id === clienteActualizado.id ? clienteActualizado : cliente
+  );
+
+  saveData(STORAGE_KEYS.CLIENTES, actualizados);
+
+  registrarEventoAuditoria({
+    tipo: "CLIENTE_CREADO",
+    descripcion: `Cliente actualizado: ${clienteActualizado.razonSocial}`,
+    entidad: "CLIENTE",
+    entidadId: clienteActualizado.id,
+  });
+
+  return actualizados;
+}

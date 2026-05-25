@@ -4,6 +4,7 @@ import {
   deleteGastoVehiculo,
   getGastosVehiculo,
   saveGastoVehiculo,
+  updateGastoVehiculo,
 } from "../services/vehiculoService";
 import { getToday } from "../utils/dates";
 
@@ -12,6 +13,7 @@ type NuevoGastoVehiculoInput = {
   descripcion: string;
   monto: number;
   vencimiento?: string;
+  fecha?: string;
 };
 
 export function useVehiculo() {
@@ -24,11 +26,16 @@ export function useVehiculo() {
   function agregarGasto(input: NuevoGastoVehiculoInput) {
     const nuevoGasto: GastoVehiculo = {
       id: crypto.randomUUID(),
-      fecha: getToday(),
+      fecha: input.fecha || getToday(),
       ...input,
     };
 
     const actualizados = saveGastoVehiculo(nuevoGasto);
+    setGastos(actualizados);
+  }
+
+  function actualizarGasto(gasto: GastoVehiculo) {
+    const actualizados = updateGastoVehiculo(gasto);
     setGastos(actualizados);
   }
 
@@ -40,6 +47,7 @@ export function useVehiculo() {
   return {
     gastos,
     agregarGasto,
+    actualizarGasto,
     eliminarGasto,
   };
 }

@@ -11,9 +11,15 @@ export default function BackupPanel() {
 
   const { message, type, showToast, clearToast } = useToast();
 
-  function handleExportar() {
-    descargarBackup();
-    showToast("Backup exportado correctamente.", "success");
+  function handleExportar(environment: "demo" | "produccion") {
+    descargarBackup(environment);
+
+    showToast(
+      environment === "demo"
+        ? "Backup DEMO exportado correctamente."
+        : "Backup de producción exportado correctamente.",
+      "success"
+    );
   }
 
   function handleSeleccionArchivo(event: ChangeEvent<HTMLInputElement>) {
@@ -62,8 +68,18 @@ export default function BackupPanel() {
         </p>
 
         <div className="backup-actions">
-          <button className="primary-button" onClick={handleExportar}>
-            Exportar backup
+          <button
+            className="primary-button"
+            onClick={() => handleExportar("produccion")}
+          >
+            Exportar producción
+          </button>
+
+          <button
+            className="secondary-button"
+            onClick={() => handleExportar("demo")}
+          >
+            Exportar demo
           </button>
 
           <button

@@ -1,9 +1,14 @@
 import { type FormEvent, useEffect, useState } from "react";
 import type { Cliente } from "../../domain/cliente";
+import type { Envio } from "../../domain/envio";
 import { useConfiguracion } from "../../hooks/useConfiguracion";
 
 type EnvioFormProps = {
   clientes: Cliente[];
+
+  envioEditando?: Envio | null;
+
+  onCancelEdit?: () => void;
 
   onSubmit: (data: {
     clienteId: string;
@@ -16,6 +21,7 @@ type EnvioFormProps = {
     tarifaContratante: number;
     costoEstimado: number;
     observaciones?: string;
+    fecha?: string;
   }) => void;
 
   onError: (message: string) => void;
@@ -25,6 +31,8 @@ type EnvioFormProps = {
 
 export default function EnvioForm({
   clientes,
+  envioEditando,
+  onCancelEdit,
   onSubmit,
   onError,
   onSuccess,
@@ -39,15 +47,75 @@ export default function EnvioForm({
   const [direccionDestino, setDireccionDestino] = useState("");
   const [localidad, setLocalidad] = useState("");
   const [provincia, setProvincia] = useState("Buenos Aires");
+
   const [tarifaReferenciaMercado, setTarifaReferenciaMercado] =
     useState(tarifaMinimaGremialBase);
+
   const [tarifaContratante, setTarifaContratante] = useState(0);
+
   const [costoEstimado, setCostoEstimado] = useState(0);
+
   const [observaciones, setObservaciones] = useState("");
 
+  const estaEditando = Boolean(envioEditando);
+
+  const [fecha, setFecha] = useState("");
+
   useEffect(() => {
-    setTarifaReferenciaMercado(tarifaMinimaGremialBase);
-  }, [tarifaMinimaGremialBase]);
+    if (!envioEditando) {
+      limpiarFormulario();
+      return;
+    }
+
+    setClienteId(envioEditando.clienteId);
+    setMateriales(envioEditando.materiales);
+    setDireccionDestino(envioEditando.direccionDestino);
+    setLocalidad(envioEditando.localidad);
+    setProvincia(envioEditando.provincia);
+
+    setTarifaReferenciaMercado(
+      envioEditando.tarifaReferenciaMercado
+    );
+
+    setTarifaContratante(
+      envioEditando.tarifaContratante
+    );
+
+    setCostoEstimado(envioEditando.costoEstimado);
+
+    setObservaciones(
+      envioEditando.observaciones ?? ""
+    );
+  }, [envioEditando]);
+
+  useEffect(() => {
+    if (!estaEditando) {
+      setTarifaReferenciaMercado(
+        tarifaMinimaGremialBase
+      );
+    }
+  }, [tarifaMinimaGremialBase, estaEditando]);
+
+  function limpiarFormulario() {
+    setClienteId("");
+    setMateriales("");
+    setDireccionDestino("");
+    setLocalidad("");
+    setProvincia("Buenos Aires");
+
+    setTarifaReferenciaMercado(
+      tarifaMinimaGremialBase
+    );
+
+    setTarifaContratante(0);
+    setCostoEstimado(0);
+    setObservaciones("");
+  }
+
+  function cancelarEdicion() {
+    limpiarFormulario();
+    onCancelEdit?.();
+  }
 
   function handleSubmit(event: FormEvent) {
     event.preventDefault();
@@ -72,18 +140,28 @@ export default function EnvioForm({
     }
 
     if (tarifaContratante <= 0) {
-      onError("La tarifa contratante debe ser mayor a cero.");
+      onError(
+        "La tarifa contratante debe ser mayor a cero."
+      );
+
       return;
     }
 
-    if (tarifaReferenciaMercado < 0 || costoEstimado < 0) {
-      onError("La tarifa de referencia de mercado y el costo estimado no pueden ser negativos.");
+    if (
+      tarifaReferenciaMercado < 0 ||
+      costoEstimado < 0
+    ) {
+      onError(
+        "La tarifa de referencia y el costo estimado no pueden ser negativos."
+      );
+
       return;
     }
 
     onSubmit({
       clienteId: clienteSeleccionado.id,
-      empresaCliente: clienteSeleccionado.razonSocial,
+      empresaCliente:
+        clienteSeleccionado.razonSocial,
       materiales,
       direccionDestino,
       localidad,
@@ -92,34 +170,48 @@ export default function EnvioForm({
       tarifaContratante,
       costoEstimado,
       observaciones,
+      fecha,
     });
 
-    onSuccess("Envío registrado correctamente.");
+    onSuccess(
+      estaEditando
+        ? "Envío actualizado correctamente."
+        : "Envío registrado correctamente."
+    );
 
-    setClienteId("");
-    setMateriales("");
-    setDireccionDestino("");
-    setLocalidad("");
-    setProvincia("Buenos Aires");
-    setTarifaReferenciaMercado(tarifaMinimaGremialBase);
-    setTarifaContratante(0);
-    setCostoEstimado(0);
-    setObservaciones("");
+    if (!estaEditando) {
+      limpiarFormulario();
+    }
   }
 
   return (
     <form className="card form-grid" onSubmit={handleSubmit}>
+      <div className="form-field full">
+        <h2>
+          {estaEditando
+            ? "Editando envío"
+            : "Registrar envío"}
+        </h2>
+      </div>
+
       <div className="form-field">
         <label>Cliente registrado</label>
 
         <select
           value={clienteId}
-          onChange={(e) => setClienteId(e.target.value)}
+          onChange={(e) =>
+            setClienteId(e.target.value)
+          }
         >
-          <option value="">Seleccionar cliente</option>
+          <option value="">
+            Seleccionar cliente
+          </option>
 
           {clientes.map((cliente) => (
-            <option key={cliente.id} value={cliente.id}>
+            <option
+              key={cliente.id}
+              value={cliente.id}
+            >
               {cliente.razonSocial}
             </option>
           ))}
@@ -131,7 +223,9 @@ export default function EnvioForm({
 
         <input
           value={materiales}
-          onChange={(e) => setMateriales(e.target.value)}
+          onChange={(e) =>
+            setMateriales(e.target.value)
+          }
           placeholder="Ej: cajas, repuestos, herramientas"
         />
       </div>
@@ -141,7 +235,9 @@ export default function EnvioForm({
 
         <input
           value={direccionDestino}
-          onChange={(e) => setDireccionDestino(e.target.value)}
+          onChange={(e) =>
+            setDireccionDestino(e.target.value)
+          }
           placeholder="Ej: Av. Siempre Viva 123"
         />
       </div>
@@ -151,7 +247,9 @@ export default function EnvioForm({
 
         <input
           value={localidad}
-          onChange={(e) => setLocalidad(e.target.value)}
+          onChange={(e) =>
+            setLocalidad(e.target.value)
+          }
           placeholder="Ej: Caseros"
         />
       </div>
@@ -161,18 +259,22 @@ export default function EnvioForm({
 
         <input
           value={provincia}
-          onChange={(e) => setProvincia(e.target.value)}
+          onChange={(e) =>
+            setProvincia(e.target.value)
+          }
         />
       </div>
 
       <div className="form-field">
-        <label>Tarifa de referencia de mercado</label>
+        <label>Tarifa referencia</label>
 
         <input
           type="number"
           value={tarifaReferenciaMercado}
           onChange={(e) =>
-            setTarifaReferenciaMercado(Number(e.target.value))
+            setTarifaReferenciaMercado(
+              Number(e.target.value)
+            )
           }
         />
       </div>
@@ -184,7 +286,9 @@ export default function EnvioForm({
           type="number"
           value={tarifaContratante}
           onChange={(e) =>
-            setTarifaContratante(Number(e.target.value))
+            setTarifaContratante(
+              Number(e.target.value)
+            )
           }
         />
       </div>
@@ -195,7 +299,11 @@ export default function EnvioForm({
         <input
           type="number"
           value={costoEstimado}
-          onChange={(e) => setCostoEstimado(Number(e.target.value))}
+          onChange={(e) =>
+            setCostoEstimado(
+              Number(e.target.value)
+            )
+          }
         />
       </div>
 
@@ -204,14 +312,41 @@ export default function EnvioForm({
 
         <textarea
           value={observaciones}
-          onChange={(e) => setObservaciones(e.target.value)}
+          onChange={(e) =>
+            setObservaciones(e.target.value)
+          }
           placeholder="Notas internas del viaje"
         />
       </div>
 
-      <button className="primary-button" type="submit">
-        Registrar envío
+      <div className="form-field">
+        <label>Fecha operación</label>
+
+        <input
+          type="date"
+          value={fecha}
+          onChange={(e) => setFecha(e.target.value)}
+        />
+      </div>
+
+      <button
+        className="primary-button"
+        type="submit"
+      >
+        {estaEditando
+          ? "Actualizar envío"
+          : "Registrar envío"}
       </button>
+
+      {estaEditando && (
+        <button
+          className="secondary-button"
+          type="button"
+          onClick={cancelarEdicion}
+        >
+          Cancelar edición
+        </button>
+      )}
     </form>
   );
 }

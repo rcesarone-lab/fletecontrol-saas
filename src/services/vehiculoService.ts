@@ -42,3 +42,24 @@ export function deleteGastoVehiculo(id: string): GastoVehiculo[] {
 
   return actualizados;
 }
+
+export function updateGastoVehiculo(
+  gastoActualizado: GastoVehiculo
+): GastoVehiculo[] {
+  const gastos = getGastosVehiculo();
+
+  const actualizados = gastos.map((gasto) =>
+    gasto.id === gastoActualizado.id ? gastoActualizado : gasto
+  );
+
+  saveData(STORAGE_KEYS.VEHICULO_GASTOS, actualizados);
+
+  registrarEventoAuditoria({
+    tipo: "GASTO_VEHICULO_CREADO",
+    descripcion: `Gasto de vehículo actualizado: ${gastoActualizado.descripcion}`,
+    entidad: "VEHICULO",
+    entidadId: gastoActualizado.id,
+  });
+
+  return actualizados;
+}

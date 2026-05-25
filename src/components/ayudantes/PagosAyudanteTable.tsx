@@ -3,11 +3,13 @@ import { formatCurrency } from "../../utils/currency";
 
 type PagosAyudanteTableProps = {
   pagos: PagoAyudante[];
+  onEdit: (pago: PagoAyudante) => void;
   onDelete: (id: string) => void;
 };
 
 export default function PagosAyudanteTable({
   pagos,
+  onEdit,
   onDelete,
 }: PagosAyudanteTableProps) {
   if (pagos.length === 0) {
@@ -50,12 +52,21 @@ export default function PagosAyudanteTable({
                 <td>{pago.metodoPago}</td>
                 <td>{pago.comprobanteUrl || "-"}</td>
                 <td>
-                  <button
-                    className="danger-button"
-                    onClick={() => onDelete(pago.id)}
-                  >
-                    Eliminar
-                  </button>
+                  <div className="action-group">
+                    <button
+                      className="secondary-button"
+                      onClick={() => onEdit(pago)}
+                    >
+                      Editar
+                    </button>
+
+                    <button
+                      className="danger-button"
+                      onClick={() => onDelete(pago.id)}
+                    >
+                      Eliminar
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}

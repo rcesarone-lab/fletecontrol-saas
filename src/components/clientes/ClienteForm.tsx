@@ -1,20 +1,27 @@
-import { type FormEvent, useState } from "react";
+import { type FormEvent, useEffect, useState } from "react";
+import type { Cliente } from "../../domain/cliente";
+
+type ClienteFormData = {
+  razonSocial: string;
+  cuit?: string;
+  contacto?: string;
+  telefono?: string;
+  email?: string;
+  direccion?: string;
+};
 
 type ClienteFormProps = {
-  onSubmit: (data: {
-    razonSocial: string;
-    cuit?: string;
-    contacto?: string;
-    telefono?: string;
-    email?: string;
-    direccion?: string;
-  }) => void;
+  clienteEditando?: Cliente | null;
+  onSubmit: (data: ClienteFormData) => void;
+  onCancelEdit?: () => void;
   onError: (message: string) => void;
   onSuccess: (message: string) => void;
 };
 
 export default function ClienteForm({
+  clienteEditando,
   onSubmit,
+  onCancelEdit,
   onError,
   onSuccess,
 }: ClienteFormProps) {
@@ -24,6 +31,36 @@ export default function ClienteForm({
   const [telefono, setTelefono] = useState("");
   const [email, setEmail] = useState("");
   const [direccion, setDireccion] = useState("");
+
+  const estaEditando = Boolean(clienteEditando);
+
+  useEffect(() => {
+    if (!clienteEditando) {
+      setRazonSocial("");
+      setCuit("");
+      setContacto("");
+      setTelefono("");
+      setEmail("");
+      setDireccion("");
+      return;
+    }
+
+    setRazonSocial(clienteEditando.razonSocial);
+    setCuit(clienteEditando.cuit ?? "");
+    setContacto(clienteEditando.contacto ?? "");
+    setTelefono(clienteEditando.telefono ?? "");
+    setEmail(clienteEditando.email ?? "");
+    setDireccion(clienteEditando.direccion ?? "");
+  }, [clienteEditando]);
+
+  function limpiarFormulario() {
+    setRazonSocial("");
+    setCuit("");
+    setContacto("");
+    setTelefono("");
+    setEmail("");
+    setDireccion("");
+  }
 
   function handleSubmit(event: FormEvent) {
     event.preventDefault();
@@ -42,18 +79,28 @@ export default function ClienteForm({
       direccion,
     });
 
-    onSuccess("Cliente registrado correctamente.");
+    onSuccess(
+      estaEditando
+        ? "Cliente actualizado correctamente."
+        : "Cliente registrado correctamente."
+    );
 
-    setRazonSocial("");
-    setCuit("");
-    setContacto("");
-    setTelefono("");
-    setEmail("");
-    setDireccion("");
+    if (!estaEditando) {
+      limpiarFormulario();
+    }
+  }
+
+  function cancelarEdicion() {
+    limpiarFormulario();
+    onCancelEdit?.();
   }
 
   return (
     <form className="card form-grid" onSubmit={handleSubmit}>
+      <div className="form-field full">
+        <h2>{estaEditando ? "Editando cliente" : "Registrar cliente"}</h2>
+      </div>
+
       <div className="form-field">
         <label>Razón social</label>
         <input
@@ -109,8 +156,18 @@ export default function ClienteForm({
       </div>
 
       <button className="primary-button" type="submit">
-        Registrar cliente
+        {estaEditando ? "Actualizar cliente" : "Registrar cliente"}
       </button>
+
+      {estaEditando && (
+        <button
+          className="secondary-button"
+          type="button"
+          onClick={cancelarEdicion}
+        >
+          Cancelar edición
+        </button>
+      )}
     </form>
   );
 }

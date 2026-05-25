@@ -1,16 +1,20 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import ClienteForm from "../components/clientes/ClienteForm";
 import ClientesTable from "../components/clientes/ClientesTable";
 import ConfirmModal from "../components/ui/ConfirmModal";
 import Toast from "../components/ui/Toast";
 import { useClientes } from "../hooks/useClientes";
 import { useToast } from "../hooks/useToast";
+import type { Cliente } from "../domain/cliente";
 
 export default function Clientes() {
-  const { clientes, agregarCliente, eliminarCliente } = useClientes();
+  const { clientes, agregarCliente, actualizarCliente, eliminarCliente } =
+    useClientes();
   const { message, type, showToast, clearToast } = useToast();
-
   const [clienteAEliminar, setClienteAEliminar] = useState<string | null>(null);
+  const [clienteEditando, setClienteEditando] = useState<Cliente | null>(null);
+  const formRef = useRef<HTMLDivElement | null>(null);
+
 
   function confirmarEliminacion() {
     if (!clienteAEliminar) return;
@@ -32,6 +36,27 @@ export default function Clientes() {
 
   function cancelarEliminacion() {
     setClienteAEliminar(null);
+  }
+
+  function guardarCliente(data: {
+    razonSocial: string;
+    cuit?: string;
+    contacto?: string;
+    telefono?: string;
+    email?: string;
+    direccion?: string;
+  }) {
+    if (clienteEditando) {
+      actualizarCliente({
+        ...clienteEditando,
+        ...data,
+      });
+
+      setClienteEditando(null);
+      return;
+    }
+
+    agregarCliente(data);
   }
 
   return (
@@ -78,9 +103,11 @@ export default function Clientes() {
         </article>
       </section>
 
-      <div style={{ marginTop: 18 }}>
+      <div ref={formRef} style={{ marginTop: 18 }}>
         <ClienteForm
-          onSubmit={agregarCliente}
+          clienteEditando={clienteEditando}
+          onSubmit={guardarCliente}
+          onCancelEdit={() => setClienteEditando(null)}
           onError={(msg) => showToast(msg, "error")}
           onSuccess={(msg) => showToast(msg, "success")}
         />
@@ -89,6 +116,22 @@ export default function Clientes() {
       <div style={{ marginTop: 18 }}>
         <ClientesTable
           clientes={clientes}
+          onEdit={(cliente) => {
+            setClienteEditando(cliente);
+
+            setTimeout(() => {
+              formRef.current?.scrollIntoView({
+                behavior: "smooth",
+                block: "start",
+              });
+
+              const firstInput = formRef.current?.querySelector(
+                "input, select, textarea"
+              ) as HTMLElement | null;
+
+              firstInput?.focus();
+            }, 0);
+          }}
           onDelete={(id) => setClienteAEliminar(id)}
         />
       </div>

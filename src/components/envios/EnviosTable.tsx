@@ -3,6 +3,7 @@ import ComparativoTarifa from "./ComparativoTarifa";
 
 type EnviosTableProps = {
   envios: Envio[];
+  onEdit: (envio: Envio) => void;
   onChangeEstado: (id: string, estado: EstadoEnvio) => void;
   onDelete: (id: string) => void;
 };
@@ -11,11 +12,14 @@ const estados: EstadoEnvio[] = [
   "PENDIENTE",
   "EN_TRANSITO",
   "ENTREGADO",
+  "FACTURADO",
+  "COBRADO",
   "CANCELADO",
 ];
 
 export default function EnviosTable({
   envios,
+  onEdit,
   onChangeEstado,
   onDelete,
 }: EnviosTableProps) {
@@ -48,58 +52,85 @@ export default function EnviosTable({
           </thead>
 
           <tbody>
-            {envios.map((envio) => (
-              <tr key={envio.id}>
-                <td>{envio.fecha}</td>
+            {envios.map((envio) => {
+              const puedeEditar =
+                envio.estado === "PENDIENTE" ||
+                envio.estado === "EN_TRANSITO";
 
-                <td>{envio.empresaCliente}</td>
+              const puedeEliminar =
+                envio.estado !== "FACTURADO" &&
+                envio.estado !== "COBRADO";
 
-                <td>
-                  {envio.direccionDestino}
-                  <br />
-                  <span className="muted">
-                    {envio.localidad}, {envio.provincia}
-                  </span>
-                </td>
+              return (
+                <tr key={envio.id}>
+                  <td>{envio.fecha}</td>
 
-                <td>{envio.materiales}</td>
+                  <td>{envio.empresaCliente}</td>
 
-                <td>
-                  <select
-                    value={envio.estado}
-                    onChange={(e) =>
-                      onChangeEstado(
-                        envio.id,
-                        e.target.value as EstadoEnvio
-                      )
-                    }
-                  >
-                    {estados.map((estado) => (
-                      <option key={estado} value={estado}>
-                        {estado}
-                      </option>
-                    ))}
-                  </select>
-                </td>
+                  <td>
+                    {envio.direccionDestino}
+                    <br />
+                    <span className="muted">
+                      {envio.localidad}, {envio.provincia}
+                    </span>
+                  </td>
 
-                <td>
-                  <ComparativoTarifa
-                    tarifaReferenciaMercado={envio.tarifaReferenciaMercado}
-                    tarifaContratante={envio.tarifaContratante}
-                    costoEstimado={envio.costoEstimado}
-                  />
-                </td>
+                  <td>{envio.materiales}</td>
 
-                <td>
-                  <button
-                    className="danger-button"
-                    onClick={() => onDelete(envio.id)}
-                  >
-                    Eliminar
-                  </button>
-                </td>
-              </tr>
-            ))}
+                  <td>
+                    <select
+                      value={envio.estado}
+                      disabled={envio.estado === "FACTURADO" || envio.estado === "COBRADO"}
+                      onChange={(e) =>
+                        onChangeEstado(envio.id, e.target.value as EstadoEnvio)
+                      }
+                    >
+                      {estados.map((estado) => (
+                        <option
+                          key={estado}
+                          value={estado}
+                          disabled={estado === "FACTURADO" || estado === "COBRADO"}
+                        >
+                          {estado}
+                        </option>
+                      ))}
+                    </select>
+                  </td>
+
+                  <td>
+                    <ComparativoTarifa
+                      tarifaReferenciaMercado={
+                        envio.tarifaReferenciaMercado
+                      }
+                      tarifaContratante={
+                        envio.tarifaContratante
+                      }
+                      costoEstimado={envio.costoEstimado}
+                    />
+                  </td>
+
+                  <td>
+                    <div className="action-group">
+                      <button
+                        className="secondary-button"
+                        disabled={!puedeEditar}
+                        onClick={() => onEdit(envio)}
+                      >
+                        Editar
+                      </button>
+
+                      <button
+                        className="danger-button"
+                        disabled={!puedeEliminar}
+                        onClick={() => onDelete(envio.id)}
+                      >
+                        Eliminar
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>

@@ -36,7 +36,7 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
             Facturación
           </NavLink>
 
-          <NavLink to="/Cobros" className="nav-link" onClick={onClose}>
+          <NavLink to="/ingresos" className="nav-link" onClick={onClose}>
             Cobros
           </NavLink>
 
@@ -47,11 +47,11 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
           <NavLink to="/ayudantes" className="nav-link" onClick={onClose}>
             Ayudantes
           </NavLink>
-
+          {/*
           <NavLink to="/facturas" className="nav-link" onClick={onClose}>
             Facturas
           </NavLink>
-
+          */}
           <NavLink to="/reportes" className="nav-link" onClick={onClose}>
             Reportes
           </NavLink>

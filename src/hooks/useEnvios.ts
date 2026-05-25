@@ -5,6 +5,7 @@ import {
   getEnvios,
   saveEnvio,
   updateEstadoEnvio,
+  updateEnvio,
 } from "../services/enviosService";
 import { getToday } from "../utils/dates";
 
@@ -19,6 +20,7 @@ type NuevoEnvioInput = {
   tarifaContratante: number;
   costoEstimado: number;
   observaciones?: string;
+  fecha?: string;
 };
 
 export function useEnvios() {
@@ -31,7 +33,7 @@ export function useEnvios() {
   function agregarEnvio(input: NuevoEnvioInput) {
     const nuevoEnvio: Envio = {
       id: crypto.randomUUID(),
-      fecha: getToday(),
+      fecha: input.fecha || getToday(),
       estado: "PENDIENTE",
       ...input,
     };
@@ -54,11 +56,17 @@ export function useEnvios() {
     setEnvios(getEnvios());
   }
 
+  function actualizarEnvio(envio: Envio) {
+    const actualizados = updateEnvio(envio);
+    setEnvios(actualizados);
+  }
+
   return {
     envios,
     agregarEnvio,
     cambiarEstado,
     eliminarEnvio,
     refrescarEnvios,
+    actualizarEnvio,
   };
 }

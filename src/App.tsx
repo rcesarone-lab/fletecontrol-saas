@@ -1,7 +1,6 @@
 import { Navigate, Route, Routes } from "react-router-dom";
-
 import PageLayout from "./components/layout/PageLayout";
-
+import ScrollToTop from "./components/layout/ScrollToTop";
 import Dashboard from "./pages/Dashboard";
 import Clientes from "./pages/Clientes";
 import Envios from "./pages/Envios";
@@ -13,9 +12,12 @@ import Facturas from "./pages/Facturas";
 import Reportes from "./pages/Reportes";
 import Configuracion from "./pages/Configuracion";
 
+
 export default function App() {
   return (
     <PageLayout>
+      <ScrollToTop />
+
       <Routes>
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
         <Route path="/dashboard" element={<Dashboard />} />

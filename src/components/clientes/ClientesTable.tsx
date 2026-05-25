@@ -2,11 +2,13 @@ import type { Cliente } from "../../domain/cliente";
 
 type ClientesTableProps = {
   clientes: Cliente[];
+  onEdit: (cliente: Cliente) => void;
   onDelete: (id: string) => void;
 };
 
 export default function ClientesTable({
   clientes,
+  onEdit,
   onDelete,
 }: ClientesTableProps) {
   if (clientes.length === 0) {
@@ -47,12 +49,21 @@ export default function ClientesTable({
                 <td>{cliente.email || "-"}</td>
                 <td>{cliente.direccion || "-"}</td>
                 <td>
-                  <button
-                    className="danger-button"
-                    onClick={() => onDelete(cliente.id)}
-                  >
-                    Eliminar
-                  </button>
+                  <div className="action-group">
+                    <button
+                      className="secondary-button"
+                      onClick={() => onEdit(cliente)}
+                    >
+                      Editar
+                    </button>
+
+                    <button
+                      className="danger-button"
+                      onClick={() => onDelete(cliente.id)}
+                    >
+                      Eliminar
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}

@@ -3,11 +3,13 @@ import { formatCurrency } from "../../utils/currency";
 
 type IngresosTableProps = {
   ingresos: Ingreso[];
+  onEdit: (ingreso: Ingreso) => void;
   onDelete: (id: string) => void;
 };
 
 export default function IngresosTable({
   ingresos,
+  onEdit,
   onDelete,
 }: IngresosTableProps) {
   if (ingresos.length === 0) {
@@ -56,12 +58,21 @@ export default function IngresosTable({
                 <td>{formatCurrency(ingreso.montoNeto)}</td>
                 <td>{ingreso.estado}</td>
                 <td>
-                  <button
-                    className="danger-button"
-                    onClick={() => onDelete(ingreso.id)}
-                  >
-                    Eliminar
-                  </button>
+                  <div className="action-group">
+                    <button
+                      className="secondary-button"
+                      onClick={() => onEdit(ingreso)}
+                    >
+                      Editar
+                    </button>
+
+                    <button
+                      className="danger-button"
+                      onClick={() => onDelete(ingreso.id)}
+                    >
+                      Eliminar
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}

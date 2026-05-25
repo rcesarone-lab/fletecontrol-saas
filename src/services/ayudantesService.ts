@@ -22,6 +22,27 @@ export function savePagoAyudante(pago: PagoAyudante): PagoAyudante[] {
   return actualizados;
 }
 
+export function updatePagoAyudante(
+  pagoActualizado: PagoAyudante
+): PagoAyudante[] {
+  const pagos = getPagosAyudantes();
+
+  const actualizados = pagos.map((pago) =>
+    pago.id === pagoActualizado.id ? pagoActualizado : pago
+  );
+
+  saveData(STORAGE_KEYS.AYUDANTES, actualizados);
+
+  registrarEventoAuditoria({
+    tipo: "PAGO_AYUDANTE_CREADO",
+    descripcion: `Pago de ayudante actualizado: ${pagoActualizado.ayudanteNombre}`,
+    entidad: "AYUDANTE",
+    entidadId: pagoActualizado.id,
+  });
+
+  return actualizados;
+}
+
 export function deletePagoAyudante(id: string): PagoAyudante[] {
   const pagos = getPagosAyudantes();
 

@@ -4,6 +4,7 @@ import {
   deleteIngreso,
   getIngresos,
   saveIngreso,
+  updateIngresoAdministrativo,
 } from "../services/ingresosService";
 import { getToday } from "../utils/dates";
 
@@ -61,10 +62,23 @@ export function useIngresos() {
     setIngresos(getIngresos());
   }
 
+  function actualizarIngresoAdministrativo(input: {
+    id: string;
+    metodoCobro: MetodoCobro;
+    referenciaOperacion?: string;
+    comision: number;
+    retencion: number;
+    observaciones?: string;
+  }) {
+    const actualizados = updateIngresoAdministrativo(input);
+    setIngresos(actualizados);
+  }
+
   return {
     ingresos,
     agregarIngreso,
     eliminarIngreso,
     refrescarIngresos,
+    actualizarIngresoAdministrativo,
   };
 }

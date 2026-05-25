@@ -21,7 +21,7 @@ export default function Facturacion() {
 
   const { message, type, showToast, clearToast } = useToast();
 
-  const [clienteId, setClienteId] = useState("");
+  const [clienteId] = useState("");
   const [desde, setDesde] = useState("");
   const [hasta, setHasta] = useState("");
   const [concepto, setConcepto] = useState("");
@@ -32,6 +32,9 @@ export default function Facturacion() {
   const [comision, setComision] = useState(0);
   const [retencion, setRetencion] = useState(0);
   const [observacionesCobro, setObservacionesCobro] = useState("");
+  const [filtroFacturaCliente, setFiltroFacturaCliente] = useState("");
+  const [filtroFacturaEstado, setFiltroFacturaEstado] = useState("");
+  const [filtroFacturaTexto, setFiltroFacturaTexto] = useState("");
 
   const configuracion = getConfiguracion();
 
@@ -40,6 +43,35 @@ export default function Facturacion() {
       .filter((envio) => seleccionados.includes(envio.id))
       .reduce((total, envio) => total + envio.tarifaContratante, 0);
   }, [enviosFacturables, seleccionados]);
+ 
+  const facturasFiltradas = useMemo(() => {
+    const texto = filtroFacturaTexto.trim().toLowerCase();
+
+    return facturas.filter((factura) => {
+      const coincideCliente =
+        !filtroFacturaCliente || factura.clienteId === filtroFacturaCliente;
+
+      const coincideEstado =
+        !filtroFacturaEstado ||
+        factura.estado === filtroFacturaEstado;
+
+      const coincideTexto =
+        !texto ||
+        factura.cliente.toLowerCase().includes(texto) ||
+        factura.concepto.toLowerCase().includes(texto);
+
+      return (
+        coincideCliente &&
+        coincideEstado &&
+        coincideTexto
+      );
+    });
+  }, [
+    facturas,
+    filtroFacturaCliente,
+    filtroFacturaEstado,
+    filtroFacturaTexto,
+  ]);
 
   function buscar() {
     if (!clienteId) {
@@ -164,53 +196,84 @@ export default function Facturacion() {
         </article>
       </section>
 
-      <section className="card form-grid" style={{ marginTop: 18 }}>
-        <div className="form-field">
-          <label>Cliente</label>
-          <select value={clienteId} onChange={(e) => setClienteId(e.target.value)}>
-            <option value="">Seleccionar cliente</option>
-            {clientes.map((cliente) => (
-              <option key={cliente.id} value={cliente.id}>
-                {cliente.razonSocial}
-              </option>
-            ))}
-          </select>
+      <section className="card" style={{ marginTop: 18 }}>
+        <div className="section-header">
+          <div>
+            <h2>Nuevo corte de facturación</h2>
+            <p className="card-note">
+              Seleccioná cliente y período para buscar envíos entregados pendientes de facturar.
+            </p>
+          </div>
         </div>
 
-        <div className="form-field">
-          <label>Desde</label>
-          <input
-            type="date"
-            value={desde}
-            onChange={(e) => setDesde(e.target.value)}
-          />
-        </div>
+        <div className="form-grid compact-filters">
+          <div className="form-field">
+            <label>Cliente</label>
+            <select
+              value={filtroFacturaCliente}
+              onChange={(e) => setFiltroFacturaCliente(e.target.value)}
+            >
+              <option value="">Todos</option>
+              {clientes.map((cliente) => (
+                <option key={cliente.id} value={cliente.id}>
+                  {cliente.razonSocial}
+                </option>
+              ))}
+            </select>
+          </div>
 
-        <div className="form-field">
-          <label>Hasta</label>
-          <input
-            type="date"
-            value={hasta}
-            onChange={(e) => setHasta(e.target.value)}
-          />
-        </div>
+          <div className="form-field">
+            <label>Fecha desde</label>
+            <input
+              type="date"
+              value={desde}
+              onChange={(e) => setDesde(e.target.value)}
+            />
+          </div>
 
-        <div className="form-field full">
-          <label>Concepto de factura</label>
-          <input
-            value={concepto}
-            onChange={(e) => setConcepto(e.target.value)}
-            placeholder="Ej: Viajes realizados primera quincena de mayo"
-          />
-        </div>
+          <div className="form-field">
+            <label>Fecha hasta</label>
+            <input
+              type="date"
+              value={hasta}
+              onChange={(e) => setHasta(e.target.value)}
+            />
+          </div>
 
-        <button className="secondary-button" type="button" onClick={buscar}>
-          Buscar envíos facturables
-        </button>
+          <button className="secondary-button" type="button" onClick={buscar}>
+            Buscar envíos facturables
+          </button>
+
+          <div className="form-field full">
+            <label>Concepto de factura</label>
+            <input
+              value={concepto}
+              onChange={(e) => setConcepto(e.target.value)}
+              placeholder="Ej: Viajes realizados primera quincena de mayo"
+            />
+          </div>
+        </div>
       </section>
 
       <section className="card table-card" style={{ marginTop: 18 }}>
-        <h2>Envíos disponibles para facturar</h2>
+        <div className="section-header">
+          <div>
+            <h2>Envíos disponibles para facturar</h2>
+            <p className="card-note">
+              Seleccioná los envíos que formarán parte del corte.
+            </p>
+          </div>
+
+          {enviosFacturables.length > 0 && (
+            <div style={{ textAlign: "right" }}>
+              <div className="card-label">Seleccionados</div>
+              <div className="card-value" style={{ fontSize: 20 }}>
+                {seleccionados.length}
+              </div>
+              <div className="card-note">{formatCurrency(totalSeleccionado)}</div>
+            </div>
+          )}
+        </div>
 
         {enviosFacturables.length === 0 ? (
           <div className="placeholder">
@@ -224,7 +287,6 @@ export default function Facturacion() {
                   <tr>
                     <th></th>
                     <th>Fecha</th>
-                    <th>Cliente</th>
                     <th>Materiales</th>
                     <th>Destino</th>
                     <th>Importe</th>
@@ -241,20 +303,31 @@ export default function Facturacion() {
                           onChange={() => toggleEnvio(envio.id)}
                         />
                       </td>
+
                       <td>{envio.fecha}</td>
-                      <td>{envio.empresaCliente}</td>
+
                       <td>{envio.materiales}</td>
+
                       <td>
                         {envio.localidad}, {envio.provincia}
                       </td>
-                      <td>{formatCurrency(envio.tarifaContratante)}</td>
+
+                      <td>
+                        <strong>{formatCurrency(envio.tarifaContratante)}</strong>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
 
-            <div style={{ marginTop: 18 }}>
+            <div
+              style={{
+                marginTop: 18,
+                display: "flex",
+                justifyContent: "flex-end",
+              }}
+            >
               <button
                 className="primary-button"
                 type="button"
@@ -268,10 +341,63 @@ export default function Facturacion() {
         )}
       </section>
 
+      <section className="card" style={{ marginTop: 18 }}>
+        <div className="section-header">
+          <div>
+            <h2>Filtros de facturas</h2>
+            <p className="card-note">
+              Buscá facturas emitidas por cliente, estado o concepto.
+            </p>
+          </div>
+        </div>
+
+        <div className="form-grid compact-filters">
+          <div className="form-field">
+            <label>Cliente</label>
+            <input
+              value={filtroFacturaCliente}
+              onChange={(e) =>
+                setFiltroFacturaCliente(e.target.value)
+              }
+              placeholder="Buscar cliente"
+            />
+          </div>
+
+          <div className="form-field">
+            <label>Estado</label>
+            <select
+              value={filtroFacturaEstado}
+              onChange={(e) =>
+                setFiltroFacturaEstado(e.target.value)
+              }
+            >
+              <option value="">Todos</option>
+              <option value="PENDIENTE_COBRO">
+                PENDIENTE_COBRO
+              </option>
+              <option value="COBRADA">
+                COBRADA
+              </option>
+            </select>
+          </div>
+
+          <div className="form-field full">
+            <label>Texto libre</label>
+            <input
+              value={filtroFacturaTexto}
+              onChange={(e) =>
+                setFiltroFacturaTexto(e.target.value)
+              }
+              placeholder="Buscar por concepto o cliente"
+            />
+          </div>
+        </div>
+      </section>
+
       <section className="card table-card" style={{ marginTop: 18 }}>
         <h2>Facturas emitidas</h2>
 
-        {facturas.length === 0 ? (
+        {facturasFiltradas.length === 0 ? (
           <div className="placeholder">Todavía no hay facturas emitidas.</div>
         ) : (
           <div className="table-wrapper">
@@ -281,6 +407,7 @@ export default function Facturacion() {
                   <th>Fecha</th>
                   <th>Cliente</th>
                   <th>Período</th>
+                  <th>Servicios</th>
                   <th>Número</th>
                   <th>Importe</th>
                   <th>Estado</th>
@@ -289,41 +416,56 @@ export default function Facturacion() {
               </thead>
 
               <tbody>
-                {facturas.map((factura) => (
+                {facturasFiltradas.map((factura) => (
                   <tr key={factura.id}>
                     <td>{factura.fecha}</td>
                     <td>{factura.cliente}</td>
                     <td>
                       {factura.periodoDesde || "-"} / {factura.periodoHasta || "-"}
                     </td>
+                    <td>{factura.envioIds?.length ?? 0}</td>
                     <td>
                       {String(factura.puntoVenta ?? 1).padStart(4, "0")}-
                       {String(factura.numero ?? 0).padStart(8, "0")}
                     </td>
                     <td>{formatCurrency(factura.importeTotal)}</td>
-                    <td>{factura.estado}</td>
                     <td>
-                      <button
-                        className="secondary-button"
-                        onClick={() =>
-                          descargarFacturaPdf({
-                            factura,
-                            configuracion,
-                          })
+                      <span
+                        className={
+                          factura.estado === "COBRADA"
+                            ? "status-badge success"
+                            : factura.estado === "PENDIENTE_COBRO"
+                              ? "status-badge warning"
+                              : "status-badge neutral"
                         }
                       >
-                        PDF
-                      </button>
+                        {factura.estado}
+                      </span>
+                    </td>
 
-                      {factura.estado === "PENDIENTE_COBRO" && (
+                    <td>
+                      <div className="action-group">
                         <button
-                          className="primary-button"
-                          style={{ marginTop: 8 }}
-                          onClick={() => setFacturaACobrar(factura.id)}
+                          className="secondary-button"
+                          onClick={() =>
+                            descargarFacturaPdf({
+                              factura,
+                              configuracion,
+                            })
+                          }
                         >
-                          Registrar cobro
+                          PDF
                         </button>
-                      )}
+
+                        {factura.estado === "PENDIENTE_COBRO" && (
+                          <button
+                            className="primary-button"
+                            onClick={() => setFacturaACobrar(factura.id)}
+                          >
+                            Cobrar
+                          </button>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 ))}

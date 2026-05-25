@@ -3,11 +3,13 @@ import { formatCurrency } from "../../utils/currency";
 
 type GastosVehiculoTableProps = {
   gastos: GastoVehiculo[];
+  onEdit: (gasto: GastoVehiculo) => void;
   onDelete: (id: string) => void;
 };
 
 export default function GastosVehiculoTable({
   gastos,
+  onEdit,
   onDelete,
 }: GastosVehiculoTableProps) {
   if (gastos.length === 0) {
@@ -46,12 +48,21 @@ export default function GastosVehiculoTable({
                 <td>{formatCurrency(gasto.monto)}</td>
                 <td>{gasto.vencimiento || "-"}</td>
                 <td>
-                  <button
-                    className="danger-button"
-                    onClick={() => onDelete(gasto.id)}
-                  >
-                    Eliminar
-                  </button>
+                  <div className="action-group">
+                    <button
+                      className="secondary-button"
+                      onClick={() => onEdit(gasto)}
+                    >
+                      Editar
+                    </button>
+
+                    <button
+                      className="danger-button"
+                      onClick={() => onDelete(gasto.id)}
+                    >
+                      Eliminar
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}

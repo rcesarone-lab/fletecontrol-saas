@@ -4,6 +4,7 @@ import {
   deleteCliente,
   getClientes,
   saveCliente,
+  updateCliente,
 } from "../services/clientesService";
 
 type NuevoClienteInput = {
@@ -14,6 +15,7 @@ type NuevoClienteInput = {
   email?: string;
   direccion?: string;
 };
+
 
 export function useClientes() {
   const [clientes, setClientes] = useState<Cliente[]>([]);
@@ -32,6 +34,11 @@ export function useClientes() {
     setClientes(actualizados);
   }
 
+  function actualizarCliente(cliente: Cliente) {
+    const actualizados = updateCliente(cliente);
+    setClientes(actualizados);
+  }
+
   function eliminarCliente(id: string) {
     const actualizados = deleteCliente(id);
     setClientes(actualizados);
@@ -41,5 +48,6 @@ export function useClientes() {
     clientes,
     agregarCliente,
     eliminarCliente,
+    actualizarCliente,
   };
 }

@@ -1,13 +1,16 @@
-import { type FormEvent, useState } from "react";
-import type { TipoGastoVehiculo } from "../../domain/vehiculo";
+import { type FormEvent, useEffect, useState } from "react";
+import type { GastoVehiculo, TipoGastoVehiculo } from "../../domain/vehiculo";
 
 type GastoVehiculoFormProps = {
+  gastoEditando?: GastoVehiculo | null;
   onSubmit: (data: {
     tipo: TipoGastoVehiculo;
     descripcion: string;
     monto: number;
     vencimiento?: string;
+    fecha?: string;
   }) => void;
+  onCancelEdit?: () => void;
   onError: (message: string) => void;
   onSuccess: (message: string) => void;
 };
@@ -21,7 +24,9 @@ const tipos: TipoGastoVehiculo[] = [
 ];
 
 export default function GastoVehiculoForm({
+  gastoEditando,
   onSubmit,
+  onCancelEdit,
   onError,
   onSuccess,
 }: GastoVehiculoFormProps) {
@@ -29,6 +34,33 @@ export default function GastoVehiculoForm({
   const [descripcion, setDescripcion] = useState("");
   const [monto, setMonto] = useState(0);
   const [vencimiento, setVencimiento] = useState("");
+
+  const estaEditando = Boolean(gastoEditando);
+  const [fecha, setFecha] = useState("");
+
+  useEffect(() => {
+    if (!gastoEditando) {
+      limpiarFormulario();
+      return;
+    }
+
+    setTipo(gastoEditando.tipo);
+    setDescripcion(gastoEditando.descripcion);
+    setMonto(gastoEditando.monto);
+    setVencimiento(gastoEditando.vencimiento ?? "");
+  }, [gastoEditando]);
+
+  function limpiarFormulario() {
+    setTipo("COMBUSTIBLE");
+    setDescripcion("");
+    setMonto(0);
+    setVencimiento("");
+  }
+
+  function cancelarEdicion() {
+    limpiarFormulario();
+    onCancelEdit?.();
+  }
 
   function handleSubmit(event: FormEvent) {
     event.preventDefault();
@@ -44,16 +76,24 @@ export default function GastoVehiculoForm({
     }
 
     onSubmit({ tipo, descripcion, monto, vencimiento });
-    onSuccess("Gasto registrado correctamente.");
 
-    setTipo("COMBUSTIBLE");
-    setDescripcion("");
-    setMonto(0);
-    setVencimiento("");
+    onSuccess(
+      estaEditando
+        ? "Gasto actualizado correctamente."
+        : "Gasto registrado correctamente."
+    );
+
+    if (!estaEditando) {
+      limpiarFormulario();
+    }
   }
 
   return (
     <form className="card form-grid" onSubmit={handleSubmit}>
+      <div className="form-field full">
+        <h2>{estaEditando ? "Editando gasto" : "Registrar gasto"}</h2>
+      </div>
+
       <div className="form-field">
         <label>Tipo de gasto</label>
         <select
@@ -95,9 +135,29 @@ export default function GastoVehiculoForm({
         />
       </div>
 
+      <div className="form-field">
+        <label>Fecha operación</label>
+
+        <input
+          type="date"
+          value={fecha}
+          onChange={(e) => setFecha(e.target.value)}
+        />
+      </div>
+
       <button className="primary-button" type="submit">
-        Registrar gasto
+        {estaEditando ? "Actualizar gasto" : "Registrar gasto"}
       </button>
+
+      {estaEditando && (
+        <button
+          className="secondary-button"
+          type="button"
+          onClick={cancelarEdicion}
+        >
+          Cancelar edición
+        </button>
+      )}
     </form>
   );
 }
